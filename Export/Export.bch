@@ -1,0 +1,13 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=PEEL_EXPORT
+Name=PEEL_EXPORT
+AppType=Batch
+[AppCode]
+File=.\Export.apc
+[Message]
+File=.\Export.mgf
+[Order]
+File=.\Export.ord
+[Dictionary Types]
+Dict-Type=..\Dicts\CFTF.dcf,Input,.\Export.ord
