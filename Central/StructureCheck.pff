@@ -1,0 +1,19 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Batch
+[Files]
+Application=C:\PEEL\CENTRAL\StructureCheck.bch
+InputData=C:\PEEL\CENTRAL\Nulldata.DAT
+Listing=C:\PEEL\CENTRAL\StructureCheck.lst
+WriteData=C:\PEEL\CENTRAL\StructureCheck.wrt
+[ExternalFiles]
+PEEL=C:\PEEL\DATA\RAW\A001.DAT
+CONTROL=C:\PEEL\LOOKUP\CONTROL.DAT
+CLUSTERS=C:\PEEL\LOOKUP\CLUSTERS.DAT
+SAMPSEL=C:\PEEL\LOOKUP\SAMPSEL.DAT
+CTRL_CLUSTER=C:\PEEL\LOOKUP\CTRL_CLUSTER.DAT
+[Parameters]
+Parameter=1001
+ViewListing=OnError
+ViewResults=No
+ListingWidth=120

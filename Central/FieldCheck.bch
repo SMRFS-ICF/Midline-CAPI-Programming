@@ -1,0 +1,16 @@
+﻿[CSPro Application]
+Version=CSPro 6.3
+Label=FIELDCHECK
+Name=FIELDCHECK
+AppType=Batch
+[External Dictionaries]
+File=..\Dicts\FieldCheck.dcf
+[AppCode]
+File=.\FIELDCHECK.app
+[Message]
+File=.\FIELDCHECK.mgf
+[Order]
+File=.\FIELDCHECK.ord
+[Dictionary Types]
+Dict-Type=..\Dicts\PEEL.dcf,Input,.\FIELDCHECK.ord
+Dict-Type=..\Dicts\FieldCheck.dcf,Working

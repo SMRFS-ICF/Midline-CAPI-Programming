@@ -1,0 +1,43 @@
+[CAPI QUESTIONS]
+Version=CSPro 4.1
+
+[LANGUAGES]
+ENG=English
+SPA=Spanish
+
+[QUESTION]
+Field=MENU_DICT.WCLUSTER
+SPA={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+SPA={\colortbl ;\red255\green0\blue0;}
+SPA=\viewkind4\uc1\pard\cf1\lang1033\b\fs24 Entre el numero del segmento en el que va a trabajar
+SPA=\par }
+ENG={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue255;\red255\green0\blue0;}
+ENG=\viewkind4\uc1\pard\cf1\lang1033\fs24 Enter the Cluster number on which you wish to work\cf2\b 
+ENG=\par }
+ENG=
+
+[QUESTION]
+Field=MENU_DICT.WSUPER
+SPA={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+SPA={\colortbl ;\red255\green0\blue128;\red255\green0\blue0;}
+SPA=\viewkind4\uc1\pard\cf1\lang1033\b\fs24 Seleccione la l\'ednea donde aparece el nombre de la supervisora  responsable del segmento\cf2
+SPA=\par }
+ENG={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue255;\red255\green0\blue128;}
+ENG=\viewkind4\uc1\pard\cf1\lang1033\fs24 Select supervisor name\cf2\b
+ENG=\par }
+
+[QUESTION]
+Field=MENU_DICT.WFINAL
+SPA={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+SPA={\colortbl ;\red255\green0\blue0;}
+SPA=\viewkind4\uc1\pard\cf1\lang1033\b\fs24 Oprima cualquier tecla y seleccione una opcion del menu que se desplegara a continuacion.
+SPA=\par }
+ENG={\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue255;\red0\green0\blue0;}
+ENG=\viewkind4\uc1\pard\cf1\lang1033\fs24 Central Office Menu.
+ENG=\par CLUSTER  = %WCLUSTER%\cf2 
+ENG=\par }
+ENG=
+

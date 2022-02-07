@@ -1,0 +1,18 @@
+﻿[CSPro Application]
+Version=CSPro 7.5
+Label=SECONDARYEDITING
+Name=SECONDARYEDITING
+AppType=Batch
+[External Dictionaries]
+File=..\dicts\CONTROL.dcf
+File=..\dicts\weights.dcf
+[AppCode]
+File=.\SecondaryEditing.app
+[Message]
+File=.\SecondaryEditing.mgf
+[Order]
+File=.\SecondaryEditing.ord
+[Dictionary Types]
+Dict-Type=..\dicts\CONTROL.dcf,External
+Dict-Type=..\dicts\weights.dcf,External
+Dict-Type=..\dicts\CFTF.dcf,Input,.\SecondaryEditing.ord

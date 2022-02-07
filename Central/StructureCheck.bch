@@ -1,0 +1,22 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=StructureCheck
+Name=StructureCheck
+AppType=Batch
+[External Dictionaries]
+File=..\Dicts\CFTF.dcf
+File=..\Dicts\Control.dcf
+File=..\Dicts\SampSel.dcf
+[AppCode]
+File=.\StructureCheck.app
+[Message]
+File=.\StructureCheck.mgf
+[Help]
+File=.\StructureCheck.qsf
+[Order]
+File=.\Cnull.fmf
+[Dictionary Types]
+Dict-Type=..\dicts\Cnull.dcf,Input,.\Cnull.fmf
+Dict-Type=..\Dicts\Control.dcf,External
+Dict-Type=..\Dicts\CFTF.dcf,External
+Dict-Type=..\Dicts\SampSel.dcf,External

@@ -1,0 +1,11 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Sort
+[Files]
+Application=C:\PEEL\CENTRAL\SORTDATA2.ssf
+InputData=C:\PEEL\DATA\ACCEPTED\A001.DAT
+OutputData=C:\PEEL\DATA\FINAL\A001.DAT
+Listing=C:\PEEL\CENTRAL\SORTDATA2.lst
+[Parameters]
+ViewListing=OnError
+ViewResults=No

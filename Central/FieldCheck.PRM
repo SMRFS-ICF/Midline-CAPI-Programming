@@ -1,0 +1,90 @@
+
+decimals period;
+thousands comma;
+style dhs1;
+
+F1 columns FTOTAL1 = 1 NODEC;
+F1 footnote
+
+@1 Household response rate = (1)/[(1)+(2)+(3)+(5)+(10)]x100; target is 95
+ percent for household response rate. 
+endfootnote;
+F2 columns FTOTAL4 = 1 NODEC;
+F2 footnote
+Target is [100% - expected prevalence of child-only households]. 
+endfootnote;
+F3 columns FTOTAL6 = 2 NODEC;
+F3 footnote
+Note: The target for all age ranges is 30 percent. 
+endfootnote;
+F3W noprint;
+F4 columns FHHMEAN = 0 NODEC FHHMEAN = 1 NODEC FHHMEAN = 2 1;
+F4 footnote
+Note: The target is [XXX] number of eligible women per household. 
+endfootnote;
+F5A columns FAGE = 12 NODEC FAGE = 13 NODEC FAGE = 14 NODEC FAGE = 15 NODEC FAGE = 16 NODEC FAGE = 17 NODEC;
+F5A footnote
+Note: Targets are ratios greater than 0.80. 
+endfootnote;
+F5B columns FAGE1 = 47 NODEC FAGE1 = 48 NODEC FAGE1 = 49 NODEC FAGE1 = 50 NODEC FAGE1 = 51 NODEC FAGE1 = 52 NODEC;
+F5B footnote
+Note: Targets are ratios greater than 0.80. 
+endfootnote;
+F5C columns FAGE2 = 20 NODEC FAGE2 = 19 NODEC FAGE2 = 18 NODEC FAGE2 = 15 NODEC FAGE2 = 16 NODEC FAGE2 = 17 NODEC;
+F5C footnote
+Note: Targets are ratios greater than 0.80. 
+endfootnote;
+F5D columns FAGE3 = 20 NODEC FAGE3 = 19 NODEC FAGE3 = 18 NODEC FAGE3 = 15 NODEC FAGE3 = 16 NODEC FAGE3 = 17 NODEC;
+F5D footnote
+Note: Targets are ratios greater than 0.80. 
+endfootnote;
+F6 columns FHHMEANM = 0 NODEC FHHMEANM = 1 NODEC FHHMEANM = 2 1;
+F6 footnote
+Note: The target is [XXX] number of eligible children per household. 
+endfootnote;
+F7 columns FAGE4 = 2 NODEC FAGE4 = 3 NODEC FAGE4 = 4 NODEC FAGE4 = 5 NODEC FAGE4 = 6 NODEC FAGE4 = 7 NODEC;
+F7 footnote
+Note: Targets are ratios greater than 0.80. 
+endfootnote;
+F8A columns FTOTAL2 = 2 NODEC;
+F8A footnote
+
+@1 The response rate is the percentage of household completed divided by
+ the number with response codes 1 and 5. The target response rate is 95
+ percent. 
+endfootnote;
+F8B columns FTOTAL3 = 2 NODEC;
+F8B footnote
+
+@1 The response rate is the percentage of household completed divided by
+ the number with response codes 1 and 5. The target response rate is 95
+ percent. 
+endfootnote;
+F9 columns FTOTAL2 = 2 NODEC;
+F9 footnote
+
+@1 The response rate is the percentage of household completed divided by
+ the number with response codes 1 and 5. The target response rate is 95
+ percent. 
+endfootnote;
+F10A columns FTOTAL1 = 1 NODEC;
+F10A footnote
+
+@1 The response rate is the percentage of household completed divided by
+ the number with response codes 1 and 5. The target response rate is 95
+ percent. 
+endfootnote;
+F10B columns FTOTAL5 = 1 NODEC;
+F10B footnote
+Target for both height and weight measured is 95 percent. 
+endfootnote;
+F11W noprint;
+F12 footnote
+Note: Birth date may be reported in questions 502 or 506. 
+Targets are 95 percent or higher complete and 5 percent or lower with no data.
+endfootnote;
+F13 columns FTOTAL8 = 1 NODEC;
+F13 footnote
+Target is 95 percent of children with heights measured in range. 
+endfootnote;
+ 

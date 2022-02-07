@@ -1,0 +1,16 @@
+﻿001 Control file for cluster %03d could not be loaded
+002 Number of households to be collected in cluster %03d hasn't been assigned to the control file
+003 The household assignment file for cluster %03d could not be loaded
+004 Household=%03d partially completed, structure will not be checked at this time
+005 Household=%03d household members in household schedule (%02d) inconsistent with total number of members (%02d)
+006 Household=%03d women eligible in household schedule (%02d) inconsistent with recorded number of eligible women (AHWOMEN=%02d)
+007 Household=%03d children eligible in household schedule (%02d) inconsistent with recorded number of eligible children (AHKIDS=%02d)
+008 Household=%03d record with data for: %s, is missing
+009 Household=%03d record with data for %s WEAI: section %s, is missing
+010 Household=%03d records for %s for %s (%02d) inconsistent with individuals eligible for %s (%02d)
+011 Household=%03d is an incomplete household (result=%d), however there are records that shouldn't exist
+012 Household=%03d assigned to interviewer %02d but collected by interviewer %02d.  Household assignment will be updated
+013 Household=%03d not found in the household sample design file. It needs to be accepted by supervisor
+014 The number of households found and registered (%02d) is correct, but there are still errors that need to be resolved
+015 Review Households found (%02d) with initial households (%02d) and those registered in control file (%02d)
+016 Household=%03d one or more mandatory modules are missing

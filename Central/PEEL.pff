@@ -1,0 +1,19 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Entry
+[DataEntryInit]
+OperatorID=Anyone
+Lock=Add, Verify
+Fullscreen=No
+NoFileOpen=Yes
+[Files]
+Application=C:\PEEL\PEEL\PEEL.ent
+InputData=C:\PEEL\DATA\RAW\A001.DAT
+Listing=C:\PEEL\DATA\RAW\peel.lst
+[ExternalFiles]
+CTRL_HH=C:\PEEL\DATA\CONTROL\CT001.dat
+OTHERS=C:\PEEL\DATA\RAW\O001.DAT
+HH_GPS=C:\PEEL\DATA\RAW\G001.DAT
+CLUSTERS=C:\PEEL\LOOKUP\CLUSTERS.DAT
+[Parameters]
+Parameter=001000000000021

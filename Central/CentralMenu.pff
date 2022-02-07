@@ -1,0 +1,29 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Entry
+
+[DataEntryInit]
+OperatorID=CODHS
+StartMode=ADD
+FullScreen=YES
+Interactive=Ask
+
+[Files]
+Application=.\CentralMenu.ent
+
+[ExternalFiles]
+INTERV=..\Lookup\interv.dat
+CONTROL=..\Lookup\control.dat
+CLUSTERS=..\Lookup\clusters.dat
+
+[UserFiles]
+STATE=
+CLOSEDCLUST=
+PIFFILE=
+SYNCFILE=
+FROMCKID=
+NEWCLUST=
+FROMCHECK=
+
+[Parameters]
+

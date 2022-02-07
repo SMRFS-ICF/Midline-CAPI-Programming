@@ -1,0 +1,12 @@
+﻿[CSSort]
+Version=CSPro 7.2
+
+[Dictionaries]
+File=..\Dicts\CFTF.dcf
+
+[SortType]
+Type=Questionnaire
+
+[Keys]
+Key=Ascending,HHEA,"Cluster number"
+Key=Ascending,HHNUM,"Household number"

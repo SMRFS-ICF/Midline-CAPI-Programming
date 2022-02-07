@@ -1,0 +1,61 @@
+﻿0001 E Failed to update the CONTROL file for cluster %d
+0002 E Count of questionnaires for cluster %03d (%02d:%02d:%02d) does not match CONTROL file (%02d:%02d:%02d)
+0003 E Cannot open CONTROL file for cluster %03d
+
+{ Household messages }
+0010 E Only one person can be a primary decisionmaker with relationship code 01 (%d were found)
+0011 W HH==>No more than one spouse/parent/parent-in-law of each sex is allowed in the household
+0012 E HH==>Primary decisionmaker (V101A(male) = %d V101B(female) = %d) sex/relationship information incorrect: V102(1) = %d V103(1) = %d V102(2) = %d V103(2) = %d
+0013 E HH==>Line %02d: Eligibility of member incorrect: Sex(V102=%1d), Age(V104=%02d), Eligibility(%s=%02d)
+0014 W HH==>Line %02d: Age(V104=%02d) of primary decisionmaker or spouse is under %02d years
+0015 W HH==>Check primary decisionmaker's age (line %02d, V104=%02d) with his/her parent's age (line %02d, V104=%02d)
+0016 W HH==>Check spouse's age (line %02d, V104=%02d) with his/her parent's age (line %02d, V104=%02d)
+0017 E HH==>Line %02d: Sex (V102=%1d) of spouse (%02d) must be different from sex (V102=%1d) of primary decisionmaker (%02d)
+0018 E HH==>Number of eligible %s incorrect: Expected %02d, found %02d
+0019 E HH==>Line %02d: Education of member (V109=%d V111=%d) inconsistent with reading/writing ability (V112=%d).
+0020 W HH==>No primary %s decisionmaker found, but eligible member found. Review household roster.
+
+{ Height and weight }
+0030 W %s Column %1d Line %02d: Weight %s=%6.2f outside range expected for age=%1d, sex=%1d
+0031 W %s Column %1d Line %02d: Height (length) %s=%05.1f outside range expected for age=%1d, sex=%1d
+0032 W Column %d Line %d second decimal for weight (AN518=%5.2f) different from 0,5
+0033 W Child Column %1d Line %02d: Children under 2 years are usually measured lying down, children 2+ measured standing up: Measured AN517=%1d, age=%02d
+0034 E Sex of child (V501=%D)is different from household roster (V102(line=%02d)=%d)
+0035 E Age of child (V508=%D)is different from household roster (V104(line=%02d)=%d)
+
+{ Individual women's questionnaire messages }
+0040 W Column=%d: Neither date of birth (V401=%02d/%04d) nor age (V402=%02d) specified
+0041 W Column=%d: Respondent's age in individual questionnaire (V402=%d) differs from age in household (V104(line=%02d)=%02d)
+
+{ Individual women's questionnaire messages }
+0050 W Neither date of birth (V6101=%02d/%04d) nor age (V6102=%02d) specified
+0051 W Respondent's age in individual questionnaire (V6102=%d) differs from age in household (V104(line=%02d)=%02d)
+0052 E Date of birth (V6101=%02d/%04d) is out of range with respect to the interview date (%02d/%04d, range=%02d/%04d-%02d/%04d)
+0053 E Date of birth (V6101=%02d/%04d, cmc=%04d-%04d) and age (V6102=%02d) inconsistent with date of interview (%02d/%04d, cmc=%04d)
+0054 W Month of birth (V6101=%d) inconsistent with other information: cmc=%04d-%04d [%02d/%04d-%02d/%04d]
+
+0060 W Decision makers for %s(%d)=%s include partner/spouse, but respondent not married/living with partner (V6105=%d)
+
+0070 E Time at start of module (%s=%02d:%02d) after time at end of module (%s=%02d:%02d)
+0071 W %s duration (%d hours) seems unlikely - please check.
+0072 E Sleeping and resting (A - %02d:%02d) with secondary activity (%s). Review full time allocation.
+0073 E Sleeping and resting (A) recorded as secondary activity in hour %02d. Review full time allocation.
+0074 W %s found before/after work or school activity (%s%s%s - %02d:%02d)
+0075 W Typically daytime activities recorded during night hours - %s%s%s%s in %02d. Please check.
+
+{ Date Editing and Imputation }
+0090 E Minimum and maximum date of event %02d cross over: cmc=%04d-%04d [%02d/%04d-%02d/%04d]
+0091 E Event %02d: Month of event (%02d) inconsistent with final range for event: cmc=%04d-%04d [%02d/%04d-%02d/%04d] imputed=%04d [%02d/%04d]
+0092 E Cannot create gap between events: cmc(%02d)=%04d-%04d [%02d/%04d-%02d/%04d], cmc(%02d)=%04d-%04d [%02d/%04d-%02d/%04d], interval=%03d
+
+
+{ Individual men's questionnaire messages }
+1050 W Neither date of birth (M6101=%02d/%04d) nor age (M6102=%02d) specified
+1051 W Respondent's age in individual questionnaire (M6102=%d) differs from age in household (V104(line=%02d)=%02d)
+1052 E Date of birth (M6101=%02d/%04d) is out of range with respect to the interview date (%02d/%04d, range=%02d/%04d-%02d/%04d)
+1053 E Date of birth (M6101=%02d/%04d, cmc=%04d-%04d) and age (M6102=%02d) inconsistent with date of interview (%02d/%04d, cmc=%04d)
+1054 W Month of birth (M6101M=%d) inconsistent with other information: cmc=%04d-%04d [%02d/%04d-%02d/%04d]
+
+
+{ Summary counts }
+90000 W Count of message %05d = %05d

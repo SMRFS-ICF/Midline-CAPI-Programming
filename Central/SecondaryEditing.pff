@@ -1,0 +1,14 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Batch
+[Files]
+Application=C:\PEEL\CENTRAL\SecondaryEditing.bch
+InputData=C:\PEEL\DATA\ACCEPTED\A001.DAT
+Listing=C:\PEEL\CENTRAL\SecondaryEditing.lst
+[ExternalFiles]
+WEIGHTS=C:\PEEL\LOOKUP\weights.DAT
+CONTROL=C:\PEEL\LOOKUP\control.DAT
+[Parameters]
+ViewListing=Always
+ViewResults=Yes
+ListingWidth=120

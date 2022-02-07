@@ -1,0 +1,50 @@
+﻿001 Cluster=%03d, not defined in sample file
+002 Interviewer %03d not found in teams file
+003 Interviewer %03d not authorized to work in Cluster %03d
+004 You must select your code
+005 A HH must be selected
+006 Error when trying to open file (%s)
+007 Cluster %d not defined in control file
+008 Cluster %d already closed
+009 Cluster %d already passed secondary editing
+010 A HH can be revisited only when result of the previous visit was incomplete or partial (%d)
+011 Supervisor can only review complete interviews (Result=%s)
+012 Height and weight valid only in complete HHs (%d)
+013 Cluster %03d already accepted
+014 Cluster %03d has not been accepted yet
+015 Make sure that the SUPERVISOR SD card is in the PDA.  Once inserted click the OK button
+016 Data for Cluster %04d were transfer to supervisor.  Click OK and after icon to disconnect external memory
+017 Cluster %3d has not passed secondary editing yet
+020 An individiaul must be selected
+025 Review result of individual interview (%s) with appropriate option (%d)
+030 Make sure that a CD is present in unit.  Once the CD is in place click OK
+031 Recording of CD has been completes.  You may continue with other activities
+054 You must select your supervisor code
+055 Supervisor can only review complete individual interviews (Result=%s)
+060 Cluster can't be closed as there are still errors
+061 External memory is not connected to computer.  Connect and repeat the option
+062 Cluster not selectd for ENSIN survey
+063 Cluster has not been closed yet, close it first with appropriate option
+064 Cluster not closed yeat and as result a listing for ENSIN survey can't be created
+065 Secondary editing for women can only be run after secondary editing for households is run
+066 It is not necessary to run inconsistencies for incomplete HHs
+070 Make sure that flash memory is in computer to make a data BACKUP to directory %s
+071 Memory flash is not connected to the computer or directory %s doesn't exist.  Data will not be backed-up to flash memory
+075 Not all proccesses required to transfer data to central office have been run yet
+080 Cluster %d sucessfully closed
+100 Error in control file when loading the Cluster
+101 Cluster was already accepted
+102 There are no data in ARRIVED directory for Cluster
+103 Cluster can't be accepted because there are still problems that need to be resolved
+104 There are no data in CLOSED directory for Cluster
+105 HHs and individuals can only be modified after been accepted.  Data don't exist in directory %s
+106 Notes file doesn't exist in directory %s
+107 Secondary editing can only be run after data are accepted.  Data don't exist in directory %s
+110 Cluster can't be closed because either it hasn't been accepted or secondary editing hasn't been run
+111 Cluster was already closed
+112 Cluster is now closed
+115 Cluster accepted successfully
+120 Download succesful
+121 Download with errors
+999 Message=%08d
+

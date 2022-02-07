@@ -1,0 +1,17 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Batch
+
+[Files]
+Application=.\FieldCheck.bch
+InputData=..\REPORTS\ALLDATA.DAT
+Listing=.\FieldCheck.lst
+
+
+[Parameters]
+ViewListing=OnError
+ViewResults=No
+ListingWidth=80
+MessageWrap=No
+ErrmsgOverride=No
+

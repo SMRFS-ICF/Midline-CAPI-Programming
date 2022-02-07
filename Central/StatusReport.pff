@@ -1,0 +1,13 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Batch
+[Files]
+Application=C:\PEEL\CENTRAL\StatusReport.bch
+InputData=C:\PEEL\LOOKUP\CONTROL.DAT
+Listing=C:\PEEL\CENTRAL\StatusReport.lst
+WriteData=C:\PEEL\REPORTS\StatusReport.wrt
+[ExternalFiles]
+INTERV=C:\PEEL\LOOKUP\INTERV.DAT
+[Parameters]
+ViewListing=OnError
+ViewResults=No

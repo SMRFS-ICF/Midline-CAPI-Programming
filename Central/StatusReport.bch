@@ -1,0 +1,18 @@
+﻿[CSPro Application]
+Version=CSPro 6.3
+Label=StatusReport
+Name=StatusReport
+AppType=Batch
+OperatorID=No
+ShowEndCaseDialog=No
+[External Dictionaries]
+File=..\Dicts\Interv.dcf
+[AppCode]
+File=.\StatusReport.app
+[Message]
+File=.\StatusReport.mgf
+[Order]
+File=.\StatusReport.ord
+[Dictionary Types]
+Dict-Type=..\Dicts\CONTROL.dcf,Input,.\StatusReport.ord
+Dict-Type=..\Dicts\Interv.dcf,External
