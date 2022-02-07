@@ -1,0 +1,26 @@
+﻿[Run Information]
+Version=CSPro 7.2
+AppType=Entry
+
+[DataEntryInit]
+Interactive=Ask
+OperatorID=Enum
+StartMode=ADD
+
+[Files]
+Application=.\entry\Interviewer.ent
+InputData=.\entry\nulldata.dat
+
+[ExternalFiles]
+CLUSTERS=.\LOOKUP\clusters.dat
+C_G=.\Lookup\control_general.dat
+CTRL_CLUSTER=.\Lookup\ctrl_cluster.dat
+SER=.\Lookup\serial.dat
+INTERV=.\Lookup\interv.dat
+CFTF=.\entry\null.dat
+
+[UserFiles]
+SYNCFILE=
+
+[Parameters]
+

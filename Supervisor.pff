@@ -1,0 +1,23 @@
+﻿[Run Information]
+Version=CSPro 7.2
+AppType=Entry
+
+[DataEntryInit]
+Interactive=Ask
+OperatorID=Sup
+StartMode=ADD
+
+[Files]
+Application=.\Supervisor\Supervisor.ent
+InputData=.\Supervisor\nulldata.dat
+
+[ExternalFiles]
+CLUSTERS=.\Lookup\clusters.dat
+C_G=.\Lookup\control_general.dat
+INTERV=.\Lookup\interv.dat
+CTRL_CLUSTER=.\Lookup\ctrl_cluster.dat
+SER=.\Lookup\serial.dat
+SAMPSEL=.\Lookup\sampsel.dat
+
+[Parameters]
+
