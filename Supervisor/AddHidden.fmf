@@ -1,0 +1,63 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=ADDHIDDEN_FF
+Label=AddHidden
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=SystemControlled
+  
+[Dictionaries]
+File=.\AddHidden.dcf
+  
+[Form]
+Name=FORM000
+Label=AddHidden questionnaire
+Level=1
+Size=688,199
+  
+Item=H_ADDRESS
+Item=H_HEAD
+  
+[EndForm]
+  
+[Level]
+Name=ADDHIDDEN_QUEST
+Label=AddHidden questionnaire
+  
+[Group]
+Required=Yes
+Name=ADDHIDDEN_QUEST_FORM
+Label=AddHidden questionnaire
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=H_ADDRESS
+Position=293,118,663,138
+Item=H_ADDRESS,ADDHIDDEN_DICT
+UpperCase=Yes
+UseUnicodeTextBox=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=193,121,271,137
+Text=H_ADDRESS
+ 
+  
+[Field]
+Name=H_HEAD
+Position=293,148,573,168
+Item=H_HEAD,ADDHIDDEN_DICT
+UpperCase=Yes
+UseUnicodeTextBox=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=193,151,244,167
+Text=H_HEAD
+ 
+[EndGroup]
+  

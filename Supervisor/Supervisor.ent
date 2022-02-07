@@ -1,0 +1,29 @@
+﻿[CSPro Application]
+Version=CSPro 7.6
+Label=SUPERVISOR
+Name=SUPERVISOR
+AppType=DataEntry
+PartialSave=Yes
+CAPI=Yes
+CaseTree=Desktop
+[External Dictionaries]
+File=..\Dicts\SERIAL.dcf
+File=..\Dicts\CTRL_CLUSTER.dcf
+File=..\Dicts\Interv.dcf
+File=..\Dicts\Clusters.dcf
+File=..\Dicts\SampSel.dcf
+[AppCode]
+File=.\Supervisor.ent.apc
+[Message]
+File=.\Supervisor.ent.mgf
+[Help]
+File=.\Supervisor.ent.qsf
+[Forms]
+File=.\Supervisor.fmf
+[Dictionary Types]
+Dict-Type=.\supervisor.dcf,Input,.\Supervisor.fmf
+Dict-Type=..\Dicts\SERIAL.dcf,External
+Dict-Type=..\Dicts\CTRL_CLUSTER.dcf,External
+Dict-Type=..\Dicts\Interv.dcf,External
+Dict-Type=..\Dicts\Clusters.dcf,External
+Dict-Type=..\Dicts\SampSel.dcf,External

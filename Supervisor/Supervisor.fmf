@@ -1,0 +1,85 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=SUPERVISOR_FF
+Label=Supervisor
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=SystemControlled
+  
+[Dictionaries]
+File=.\supervisor.dcf
+  
+[Form]
+Name=FORM000
+Label=supervisor questionnaire
+Level=1
+Size=375,206
+  
+Item=SUPERVISOR_ID
+Item=CLUSTER_ID
+Item=HH_NUMBER
+Item=HH_HIDDEN
+  
+[EndForm]
+  
+[Level]
+Name=SUPERVISOR_QUEST
+Label=supervisor questionnaire
+  
+[Group]
+Required=Yes
+Name=SUPERVISOR_QUEST_FORM
+Label=supervisor questionnaire
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=SUPERVISOR_ID
+Position=247,28,360,48
+Item=SUPERVISOR_ID,SUPERVISOR_DICT
+UseEnterKey=Yes
+Form=1
+  
+[Text]
+Position=55,31,126,47
+Text=Main menu
+ 
+  
+[Field]
+Name=CLUSTER_ID
+Position=247,65,290,85
+Item=CLUSTER_ID,SUPERVISOR_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=55,68,135,84
+Text=CLUSTER_ID
+ 
+  
+[Field]
+Name=HH_NUMBER
+Position=247,104,290,124
+Item=HH_NUMBER,SUPERVISOR_DICT
+FieldLabelType=DictionaryLabel
+Form=1
+  
+[Text]
+Position=55,107,129,123
+Text=HH_number
+ 
+  
+[Field]
+Name=HH_HIDDEN
+Position=247,143,290,163
+Item=HH_HIDDEN,SUPERVISOR_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=55,146,128,162
+Text=HH_HIDDEN
+ 
+[EndGroup]
+  

@@ -1,0 +1,30 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=CheckID
+Name=CheckID
+AppType=DataEntry
+OperatorID=No
+ShowEndCaseDialog=No
+[External Dictionaries]
+File=..\Dicts\CFTF.dcf
+File=..\Dicts\Clusters.dcf
+File=..\Dicts\SampSel.dcf
+File=..\Dicts\CTRL_CLUSTER.dcf
+File=..\Dicts\Transmit.dcf
+File=..\Dicts\GPS.dcf
+[AppCode]
+File=.\CheckID.app
+[Message]
+File=.\CheckID.mgf
+[Help]
+File=.\CheckID.qsf
+[Forms]
+File=.\Cnull.fmf
+[Dictionary Types]
+Dict-Type=..\dicts\Cnull.dcf,Input,.\Cnull.fmf
+Dict-Type=..\Dicts\Clusters.dcf,External
+Dict-Type=..\Dicts\CFTF.dcf,External
+Dict-Type=..\Dicts\SampSel.dcf,External
+Dict-Type=..\Dicts\CTRL_CLUSTER.dcf,External
+Dict-Type=..\Dicts\Transmit.dcf,External
+Dict-Type=..\Dicts\GPS.dcf,External

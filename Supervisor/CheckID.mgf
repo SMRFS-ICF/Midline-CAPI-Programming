@@ -1,0 +1,21 @@
+﻿50039 Data to be verified for this cluster - Interviewer B / Ag data must first be sent to Interviewer A for each household.
+50040 Number of households to be collected in cluster %04d hasn't been assigned to the control file
+50041 Control file for cluster %03d could not be loaded
+50042 The household assignment file for cluster %03d could not be loaded
+50043 The %s barcode sheet file for cluster %03d could not be loaded
+50050 Household=%04d household members in household schedule (%02d) inconsistent with total number of members (%02d)
+50051 Household=%04d women eligible in household schedule (%02d) inconsistent with total number of eligible women (%02d)
+50052 Household=%04d men eligible in household schedule (%02d) inconsistent with total number of eligible men (%02d)
+50054 Household=%04d records for %s (%02d) inconsistent with individuals eligible for biomarkers (%02d)
+50055 Household=%04d partially completed, structure will not be checked at this time
+50057 Households=%03d GPS data is missing
+50100 Household=%04d record with data for: %s, is missing
+50101 Household=%04d incorrect number of records for mosquito nets %d expected %d
+50110 Household=%04d this is an incomplete household (result=%d), however there are records that shouldn't exist
+50150 Review Households found (%02d) with initial households (%02d) and those registered in control file (%02d)
+50151 The number of households found and registered (%02d) is correct, but there are still errors that need to be resolved
+50210 Household=%04d had previoulsy been accepted but modifications made after caused errors
+50225 Household=%04d assigned to interviewer %02d but collected by interviewer %02d.  Household assignment will be updated
+50400 Household=%02d not found in the household sample design file. It needs to be accepted by supervisor
+50401 Household=%04d wasn't accepted by supervisors it needs to be removed from interviewer %d
+

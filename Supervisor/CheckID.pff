@@ -1,0 +1,25 @@
+﻿[Run Information]
+Version=CSPro 6.3
+AppType=Entry
+
+[DataEntryInit]
+Interactive=Ask
+
+[Files]
+Application=.\CheckID.ent
+InputData=.\nulldata.dat
+
+[ExternalFiles]
+PEEL=..\Data\RECEIVED\A001001010.dat
+CTRL_CLUSTER=..\Lookup\ctrl_cluster.dat
+CLUSTERS=..\Lookup\clusters.dat
+SAMPSEL=..\Lookup\SAMPSEL.DAT
+
+[UserFiles]
+WRITEMSG=
+FNAME=
+READMSG=
+PARTIALFILE=
+
+[Parameters]
+

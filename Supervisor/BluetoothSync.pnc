@@ -1,0 +1,21 @@
+﻿[SyncFile]
+Version=CSPro 6.3
+Description=Receive program updates...
+RootFolder=C:\Peel\
+[Connection]
+Type=Dropbox
+[Sync]
+ClientPath=/PEEL
+ServerPath=/PEEL/PEEL
+Get=PEEL.pen
+ClientPath=/
+ServerPath=/PEEL/Supervisor
+Get=Supervisor.pen
+ClientPath=/Supervisor
+Get=AddHidden.pen
+ClientPath=/Entry
+ServerPath=/PEEL/Entry
+Get=*.pen
+ClientPath=/Lookup
+ServerPath=/PEEL/Lookup
+Get=interv.dat

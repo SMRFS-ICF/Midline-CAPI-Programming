@@ -1,0 +1,41 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=AddHidden
+Name=ADDHIDDEN_DICT
+RecordTypeStart=1
+RecordTypeLen=1
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=AddHidden questionnaire
+Name=ADDHIDDEN_QUEST
+
+[IdItems]
+
+[Item]
+Label=AddHidden identification
+Name=ADDHIDDEN_ID
+Start=2
+Len=1
+
+[Record]
+Label=AddHidden record
+Name=ADDHIDDEN_REC
+RecordTypeValue='1'
+RecordLen=72
+
+[Item]
+Label=Hidden Address
+Name=H_ADDRESS
+Start=3
+Len=40
+DataType=Alpha
+
+[Item]
+Label=Hidden Head
+Name=H_HEAD
+Start=43
+Len=30
+DataType=Alpha

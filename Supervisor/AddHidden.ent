@@ -1,0 +1,27 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=ADDHIDDEN
+Name=ADDHIDDEN
+AppType=DataEntry
+CAPI=Yes
+CAPIFont1=-016 0000 0000 0000 0400 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+CAPIFont2=-016 0000 0000 0000 0400 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+CAPIFont1Color=0
+CAPIFont2Color=16711680
+[External Dictionaries]
+File=..\Dicts\Clusters.dcf
+File=..\Dicts\SampSel.dcf
+File=..\Dicts\CTRL_CLUSTER.dcf
+[AppCode]
+File=.\AddHidden.ent.apc
+[Message]
+File=.\AddHidden.ent.mgf
+[Help]
+File=.\AddHidden.ent.qsf
+[Forms]
+File=.\AddHidden.fmf
+[Dictionary Types]
+Dict-Type=..\Dicts\Clusters.dcf,External
+Dict-Type=..\Dicts\SampSel.dcf,External
+Dict-Type=.\AddHidden.dcf,Input,.\AddHidden.fmf
+Dict-Type=..\Dicts\CTRL_CLUSTER.dcf,External

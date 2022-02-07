@@ -1,0 +1,53 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=supervisor
+Name=SUPERVISOR_DICT
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=supervisor questionnaire
+Name=SUPERVISOR_QUEST
+
+[IdItems]
+
+[Item]
+Label=supervisor identification
+Name=SUPERVISOR_ID
+Start=1
+Len=8
+DataType=Alpha
+
+[Record]
+Label=supervisor record
+Name=SUPERVISOR_REC
+RecordTypeValue=''
+RecordLen=18
+
+[Item]
+Label=Cluster
+Name=CLUSTER_ID
+Start=9
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=HH_number
+Name=HH_NUMBER
+Start=12
+Len=3
+
+[Item]
+Label=HH Hidden
+Name=HH_HIDDEN
+Start=15
+Len=3
+
+[Item]
+Label=dummy_var
+Name=DUMMY_VAR
+Start=18
+Len=1

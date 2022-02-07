@@ -1,0 +1,27 @@
+﻿[CAPI QUESTIONS]
+Version=CSPro 6.3
+
+[LANGUAGES]
+ENG=English
+
+[QUESTION]
+Field=ADDHIDDEN_DICT.H_ADDRESS
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang11274{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;\red0\green0\blue255;}
+ENG={\*\generator Riched20 10.0.15063}\viewkind4\uc1 
+ENG=\pard\cf1\b\fs24 Hidden Household\par
+ENG=\b0\fs16\par
+ENG=\cf2\fs20 Enter address location for the Hidden Household %name%\fs16\par
+ENG=}
+
+[QUESTION]
+Field=ADDHIDDEN_DICT.H_HEAD
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang11274{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;\red0\green0\blue255;}
+ENG={\*\generator Riched20 10.0.15063}\viewkind4\uc1 
+ENG=\pard\cf1\b\fs24 Hidden Household\par
+ENG=\b0\fs16\par
+ENG=\cf2\fs20 Enter Head of the household name for the Hidden Household %name%\fs16\par
+ENG=\cf1\b\fs24\par
+ENG=}
+
