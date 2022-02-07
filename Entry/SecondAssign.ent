@@ -1,0 +1,20 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=SECONDASSIGN
+Name=SECONDASSIGN
+AppType=DataEntry
+[External Dictionaries]
+File=..\Dicts\Interv.dcf
+File=..\Dicts\CTRL_HH.dcf
+[AppCode]
+File=.\SecondAssign.apc
+[Message]
+File=.\SecondAssign.mgf
+[Help]
+File=.\SecondAssign.qsf
+[Forms]
+File=.\SecondAssign.fmf
+[Dictionary Types]
+Dict-Type=.\secondassign.dcf,Input,.\SecondAssign.fmf
+Dict-Type=..\Dicts\Interv.dcf,External
+Dict-Type=..\Dicts\CTRL_HH.dcf,External

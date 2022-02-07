@@ -1,0 +1,39 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=secondassign
+Name=SECONDASSIGN_DICT
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=secondassign questionnaire
+Name=SECONDASSIGN_QUEST
+
+[IdItems]
+
+[Item]
+Label=Assignment identifier
+Name=SECONDASSIGN_ID
+Start=1
+Len=1
+
+[Record]
+Label=secondassign record
+Name=SECONDASSIGN_REC
+RecordTypeValue=''
+RecordLen=7
+
+[Item]
+Label=Second interviewer
+Name=SEC_INTERV
+Start=2
+Len=3
+
+[Item]
+Label=Ag interviewer
+Name=AG_INTERV
+Start=5
+Len=3

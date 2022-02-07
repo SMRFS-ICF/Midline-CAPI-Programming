@@ -1,0 +1,68 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=SECONDASSIGN_FF
+Label=SecondAssign
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=OperatorControlled
+  
+[Dictionaries]
+File=.\secondassign.dcf
+  
+[Form]
+Name=FORM000
+Label=secondassign questionnaire
+Level=1
+Size=348,219
+  
+Item=SEC_INTERV
+Item=SECONDASSIGN_ID
+Item=AG_INTERV
+  
+[EndForm]
+  
+[Level]
+Name=SECONDASSIGN_QUEST
+Label=secondassign questionnaire
+  
+[Group]
+Required=Yes
+Name=SECONDASSIGN_QUEST_FORM
+Label=secondassign questionnaire
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=SEC_INTERV
+Position=275,140,318,160
+Item=SEC_INTERV,SECONDASSIGN_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=183,143,263,159
+Text=SEC_INTERV
+ 
+  
+[Field]
+Name=AG_INTERV
+Position=280,174,323,194
+Item=AG_INTERV,SECONDASSIGN_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=185,178,258,194
+Text=AG_INTERV
+ 
+  
+[Field]
+Name=SECONDASSIGN_ID
+Position=5,3,20,23
+Item=SECONDASSIGN_ID,SECONDASSIGN_DICT
+Protected=Yes
+Form=1
+  
+[EndGroup]
+  

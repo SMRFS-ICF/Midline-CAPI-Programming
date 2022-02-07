@@ -1,0 +1,26 @@
+﻿[CSPro Application]
+Version=CSPro 7.6
+Label=CFTF
+Name=CFTF
+AppType=DataEntry
+OperatorID=No
+CAPI=Yes
+[External Dictionaries]
+File=..\Dicts\Clusters.dcf
+File=..\Dicts\CTRL_HH.dcf
+[AppCode]
+File=.\CFTF.apc
+[Message]
+File=.\CFTF.mgf
+[Help]
+File=.\CFTF.qsf
+[Forms]
+File=.\CFTF.fmf
+File=.\Others.fmf
+File=.\GPS.fmf
+[Dictionary Types]
+Dict-Type=..\Dicts\CFTF.dcf,Input,.\CFTF.fmf
+Dict-Type=..\Dicts\Clusters.dcf,External
+Dict-Type=..\dicts\Others.dcf,External,.\Others.fmf
+Dict-Type=..\dicts\GPS.dcf,External,.\GPS.fmf
+Dict-Type=..\Dicts\CTRL_HH.dcf,External

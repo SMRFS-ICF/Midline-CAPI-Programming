@@ -1,0 +1,77 @@
+﻿{ !! TO DO - output must be modified to display on tablet, likely HTML, and for specific survey eligibility }
+PROC GLOBAL
+
+  string	cluster, reportfilename;
+  numeric 	xhhnum, xcluster, i, x, y, j;
+  file		tmpfile;
+
+PROC FL_CNULL
+preproc
+
+  filedelete(".\application.pff");
+
+  { converts parameter to numbers  }
+  xcluster = tonumber( sysparm()[1:3] );   { cluster number }
+  xhhnum   = tonumber( sysparm()[4:3] );   { household number }
+  cluster  = sysparm()[1:3];
+
+  FileDelete(concat("./temp/R",cluster,".txt"));
+  setfile(tmpfile,concat("./temp/R",cluster,".txt"));
+
+  open( CFTF );
+
+  HHEA  = xcluster;
+  HHNUM = xhhnum;
+  { list of individuals and children eligible for individual and height & weight }
+  if loadcase( CFTF, HHEA, HHNUM ) then
+    {ENG+}
+    filewrite( tmpfile, maketext( "Cluster: %d, Household: %d", HHEA, HHNUM ));
+    filewrite( tmpfile, " " );
+    filewrite( tmpfile, " " );
+    filewrite( tmpfile, "Women Eligible for Nutrition/Anthropometry" );
+    filewrite( tmpfile, " " );
+    filewrite( tmpfile, "Line Name                 Age(yrs)" );
+    filewrite( tmpfile, "-------------------------------------------" );
+ {+ENG}
+    for i in record MOD_1 do
+      if V107(i) <> 0 then 
+
+            filewrite( tmpfile, maketext( " %02d  %s   %d   ",M1_LINE(i),V101(i),V104(i) ) );
+
+      endif;
+    enddo;
+  {ENG+}
+    filewrite( tmpfile, " " );
+    filewrite( tmpfile, "Children Eligible for Nutrition/Anthropometry" );
+    filewrite( tmpfile, " " );
+    filewrite( tmpfile, "Line Name                Sex  Age(yrs)    " );
+    filewrite( tmpfile, "-------------------------------------------" );
+  {+ENG}
+    for i in record MOD_1 do
+      if V108 <> 0 then 
+
+            filewrite( tmpfile, maketext( " %02d  %s   %d   ",M1_LINE(i),V101(i),V104(i) ) );
+      endif;
+    enddo;
+  else
+    {ENG+} errmsg( "Household %03d not found in cluster %03d", xhhnum, xcluster ); {+ENG}
+  endif;
+  filewrite(tmpfile,"</BODY>");
+  filewrite(tmpfile,"</HTML>");
+
+  close( CFTF );
+  close(tmpfile);
+
+  { HTML code }
+// from NAIIS... not sure  filecopy(concat("./temp/repc",cluster_c,".txt"),"./final/");
+  reportFilename = maketext("%sreport.html", pathname(Application));
+  fileconcat("./entry/report.html","./lookup/rep_header.txt",concat("./temp/R",cluster,".txt"));
+  if getos() in 20:29 then { Android }
+	execsystem(maketext("view:%s", reportFilename),wait);
+  else
+	execsystem(maketext("%sexplorer.exe %s", pathname(Windows), reportFilename),wait);
+  endif;
+  execpff("./Interviewer.pff",stop);	
+  
+  stop(-1);
+

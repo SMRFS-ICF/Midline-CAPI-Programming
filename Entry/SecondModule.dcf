@@ -1,0 +1,33 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=SecondModule
+Name=SECONDMODULE_DICT
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=SecondModule questionnaire
+Name=SECONDMODULE_QUEST
+
+[IdItems]
+
+[Item]
+Label=SecondModule identification
+Name=SECONDMODULE_ID
+Start=1
+Len=1
+
+[Record]
+Label=SecondModule record
+Name=SECONDMODULE_REC
+RecordTypeValue=''
+RecordLen=2
+
+[Item]
+Label=Second module temp var
+Name=SECOND_MODULE_TEMP_VAR
+Start=2
+Len=1

@@ -1,0 +1,73 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=INTERVIEWER_FF
+Label=Interviewer
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=SystemControlled
+  
+[Dictionaries]
+File=.\Interviewer.dcf
+  
+[Form]
+Name=FORM000
+Label=Interviewer questionnaire
+QuestionTextHeight=117
+Level=1
+Size=357,147
+  
+Item=CLUSTER_ID
+Item=HH_NUMBER
+Item=INTERVIEWER_ID
+  
+[EndForm]
+  
+[Level]
+Name=INTERVIEWER_QUEST
+Label=Interviewer questionnaire
+  
+[Group]
+Required=Yes
+Name=INTERVIEWER_QUEST_FORM
+Label=Interviewer questionnaire
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=INTERVIEWER_ID
+Position=219,27,332,47
+Item=INTERVIEWER_ID,INTERVIEWER_DICT
+Form=1
+  
+[Text]
+Position=85,28,182,44
+Text=Enter password
+ 
+  
+[Field]
+Name=CLUSTER_ID
+Position=249,65,306,85
+Item=CLUSTER_ID,INTERVIEWER_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=75,68,155,84
+Text=CLUSTER_ID
+ 
+  
+[Field]
+Name=HH_NUMBER
+Position=250,102,279,122
+Item=HH_NUMBER,INTERVIEWER_DICT
+Protected=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=76,105,156,121
+Text=HH_NUMBER
+ 
+[EndGroup]
+  

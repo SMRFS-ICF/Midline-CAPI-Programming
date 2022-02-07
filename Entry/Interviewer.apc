@@ -1,0 +1,1867 @@
+﻿PROC GLOBAL
+
+
+string		p_version="14JULY2021"; 
+numeric 	i,j,k,l,m,nn,ii;			{ internal auxiliar calcularion variables }
+string		c_i,c_j,c_k,ct_record,backup,xfilenum,data;		{ internal text variable }
+string		rec_1,rec_2,rec_3, test;			{ records from CFTF datafiles }
+alpha(3)	cod_oper;					{ Operator code }
+numeric		lrc,file_status,n;			{ loadcase/selcase return code }
+numeric		always,always2,always3,
+			always4,aux_cluster,
+			cluster_ok;					{ internal variables }
+numeric		choice,choice2,choice3,
+			choice4, choice5, main; 	{ selected option from menu }
+alpha(1)	scode;						{ serial code to retrieve the operator id }
+alpha(1)	prefix;						{ File prefix A=PartA, B=PartB }
+alpha(3)	eq_id_c;					{ equipment id in char }
+alpha(3)	cluster_c;					{ current cluster selected }
+alpha(3)	hh_c;						{ HH id in char }
+string		app_folder,app;				{ folder where is located the application and the application name - dynamic }
+string		lati,longi;					{ gps coordinates }
+numeric		hh_count;					{ total HH in the cluster }
+numeric		curr_hh;					{ current hh }
+numeric		sec_enum, src;					{ 2nd interviewer active }
+string		f_name;						{ file name, used for file selection to be transmitted }
+numeric		addmode;					{ defines if the application starts in addmode(new data file) or modify mode(data file exist) }
+file		working_file;				{ dymanics files created for the execution }
+file		input_1st;					{ datafile from 1st interviewer }
+file		input_2nd;					{ datafile from 2nd interviewer }
+file		input_ct;					{ read CT file corresponding to 1 cluster/HH }
+file 		check;
+
+// Syncronization variables 
+string SyncFilename = "BluetoothSync.pnc";
+string SyncDeviceName = "CSEntryBluetoothSync";
+string SyncDeviceTeam;
+
+
+{ ------------------------------------------------------------------ }
+// First transmission with Team Leader, or first transmission for new cycle.
+// Receives tables: C_G : General parameters included current cycle, Interv : Personnel list, RWSAMP : Sample with all clusters
+function en_first_transmission()
+  close(C_G);
+  close(INTERV);
+  close(CLUSTERS);
+  close(SER);
+
+  errmsg(11050);
+  
+  if !syncconnect( Bluetooth ) then
+    errmsg( 11053 );
+	en_first_transmission = 0;
+  else
+    syncfile( GET, "../LOOKUP/control_general.dat","../LOOKUP/");
+    syncfile( GET, "../LOOKUP/ctrl_cluster.dat","../LOOKUP/");
+    syncfile( GET, "../LOOKUP/clusters.dat","../LOOKUP/");
+    syncfile( GET, "../LOOKUP/interv.dat","../LOOKUP/");
+    syncfile( GET, "../LOOKUP/rep_header.txt","../LOOKUP/");
+    syncfile( GET, "../ENTRY/*.pen","../ENTRY/"); 
+    
+	syncdisconnect();
+	errmsg(11052);
+	en_first_transmission = 1;
+  
+  endif;
+	
+  filedelete("./LOOKUP/*.idx");
+  filedelete("./LOOKUP/*.csidx");
+	
+  errmsg(11017);
+  execPFF("interviewer.pff",stop);
+  stop(-1);
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Serialization 
+function en_serial()
+  {ENG+} errmsg("Select team supervisor"); {+ENG}
+  {{FR+} errmsg("Sélectionnez le superviseur de l'équipe"); {+FR}}  
+  lrc = selcase(interv,"") include (interv.iname) where icode%10 = 0;
+  if lrc then
+ 	i = int(icode/10);
+	{ENG+} errmsg("Select fieldworker assigned to this tablet"); {+ENG}
+	{{FR+} errmsg("Sélectionnez l'agent de terrain affecté à cette tablette"); {+FR}}	
+	lrc = selcase(interv,"") include (interv.iname) where int(icode/10) = i ;
+    if lrc then
+      serial_id = 2;
+	  eq_id = interv.icode;
+	  ser.team_id = i;
+	  ser.c_cluster = 0;
+	  ser.eq_id_sex = interv.isex;
+	  lrc = writecase(ser);
+	  if lrc = 0 then;
+	    errmsg(11001);
+		stop(1);
+	  endif;
+	  errmsg(11002);
+	  en_serial = 1;
+	endif;	
+  endif;
+end;
+
+function Checkserial()
+	{checking for Serialization}
+	close(SER);
+	if fileexist("../Lookup/serial.dat") then
+		filedelete("../Lookup/Serial.dat.csidx"); 
+		setfile(SER,"../Lookup/Serial.dat"); 
+	else
+		setfile(SER,"../Lookup/Serial.dat",create); 
+	endif;
+	scode="2";  
+	if !loadcase(SER,scode) then
+		en_serial();
+	endif;
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Normal transmission with Team Leader
+// Receives tables: C_G : General parameters included current cycle and new passwords
+// send perpared data: data files, pictures
+
+function en_transmission()
+
+	close(ctrl_cluster);
+	close(c_g);
+	close(clusters);
+
+	errmsg(11050);
+
+  if !syncconnect( Bluetooth ) then
+    errmsg( 11053 );
+	en_transmission = 0;
+	lrc = 0;
+  else
+    syncfile( GET, "../LOOKUP/control_general.dat","../LOOKUP/");
+    syncfile( GET, "../LOOKUP/ctrl_cluster.dat","../LOOKUP/");
+    syncfile( PUT, "../DATA/TRANSMISSION/*.dat","../DATA/RECEIVED/");
+    syncfile( PUT, "../DATA/TRANSMISSION/*.not","../DATA/RECEIVED/");
+    syncfile( PUT, "../DATA/CONTROL/CT*.dat", "../DATA/CONTROL/");
+    
+	syncdisconnect();
+	errmsg(11052);
+	en_transmission = 1;
+	lrc = 1;
+  
+  endif;
+	
+	if lrc = 1 then
+  	  filedelete("Data/TRANSMISSION/*.*");
+	endif;
+	
+	filedelete("./LOOKUP/*ctrl_cluster*.csidx");
+	filedelete("./LOOKUP/*control_general*.csidx");
+	Open(C_G);
+	Open(CTRL_CLUSTER);
+		
+end;
+
+
+
+{ ------------------------------------------------------------------ }
+// Normal Transmission with 2nd Interviewers. Control that only authorized interviewers can transmit
+// Send initial tables
+// Receive captured data, 
+function en_trans_to_2nd()
+// preparation for bluetooth transmission as server 
+// write out a sync file as the server
+
+	errmsg(11050);	
+	src = syncserver(Bluetooth,"..\");
+	if src = 1 then
+		errmsg(11052);
+	else
+		errmsg(11053);
+	endif;
+
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Join the files from first and secondary interviewer and generate a unique file
+function en_join_files(alpha(6) clust_hh,alpha(3) interv1, alpha(3) interv2, cur_int ) 
+// HH Control information from file CTccchhh in in c_i variable 
+  while 1 do
+	if cur_int = 2 then
+		setfile(input_1st,concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv1)),".dat")); { data for Interviewer B/Ag in HH }
+		setfile(input_2nd,concat("./Data/RAWD/A",clust_hh,edit("999",tonumber(interv2)),".dat")); { data for Interviewer A in HH } 
+		if fileexist(concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv2)),".dat")) = 1 then
+			filedelete(concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv2)),".dat"))
+		endif;
+		setfile(working_file,concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv2)),".dat")); { data file that is combination of all the work }
+
+		i = fileread(input_1st,rec_1);
+		if i = 0 then
+		  {ENG+}
+			errmsg("Error accessing first data file");
+          {+ENG}
+          {{FR+}
+			errmsg("Erreur lors de l'accès au premier fichier de données");         
+          {+FR}}
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			break;
+		endif;
+		if rec_1[7:2] <> "FL" then
+		  {ENG+} errmsg("FL record not found"); {+ENG}
+		  {{FR+} errmsg("Fichier FL non trouvé"); {+FR}}
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			break;
+		endif;
+		
+		i = fileread(input_2nd,rec_2);
+		if i = 0 then
+			{ENG+} errmsg("Error accessing second data file");  {+ENG}
+            {{FR+}errmsg("Erreur lors de l'accès au second fichier de données"); {+FR}}        			                  
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			break;
+		endif;
+		if rec_2[7:2] <> "FL" then
+			{ENG+} errmsg("FL record not found"); {+ENG}
+  			{{FR+} errmsg("Fichier FL non trouvé"); {+FR}}
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			break;
+		endif;
+		rec_3 = rec_2[1:11];
+		
+// Updating FL record { !! TO DO - check positions in ct_record match interviewer assignments and rec_2 match FLOW module in CFTF.dcf }
+		if ct_record[17:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[12:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[20:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[16:8]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[23:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[24:8]);
+		else
+			rec_3 = concat(rec_3,"N/A N/A ");
+		endif;
+		if ct_record[26:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[32:4]);
+		else
+			rec_3 = concat(rec_3,"N/A N/A ");
+		endif;
+		if ct_record[29:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[36:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[32:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[40:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[35:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[44:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[38:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[48:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[41:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[52:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[44:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[56:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[47:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[60:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[50:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[64:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[53:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[68:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[56:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[72:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[59:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[76:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[62:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[80:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[65:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[84:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[68:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[88:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		if ct_record[71:3] = interv2 then
+			rec_3 = concat(rec_3,rec_2[92:4]);
+		else
+			rec_3 = concat(rec_3,"N/A ");
+		endif;
+		
+		i = filewrite(working_file,rec_3);
+		if i = 0 then
+			{ENG+} errmsg("Could not write record (FL)"); {+ENG}
+			{{FR+} errmsg("Impossible d'écrire l'enregistrement (FL)"); {+FR}}
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			break;
+		endif;
+		i = fileread(input_2nd,rec_2);		{ skip FL record }		
+		i = fileread(input_1st,rec_1);
+		
+		while rec_1[7:1] < "04" do	{ modules before Module 3 - type value 04 }
+			rec_3 = rec_1;
+			i = filewrite(working_file,rec_3);
+			i = fileread(input_1st,rec_1);
+		enddo;
+
+		
+// module 3 by second interviewer? 
+		if ct_record[17:3] = interv2 then
+			while rec_2[7:2] < "04" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "04" then
+				rec_3 = rec_2;			
+				i = filewrite(working_file,rec_3);
+			endif;
+		endif;
+			
+// module 4 by second interviewer? 
+		if ct_record[20:3] = interv2 then
+			while rec_2[7:2] < "05" do	
+ 			  i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "05" then	{ Mod_4_INF - type value 05 }
+				while rec_2[7:2] < "08" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;	
+			endif;	
+		endif;
+		
+// module 5 by second interviewer? 
+		if ct_record[23:3] = interv2 then
+			while rec_2[7:2] < "08" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "08" then
+				while rec_2[7:2] < "11" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;	
+			endif;	
+		endif;
+			
+// module 6F by second interviewer? 
+		if ct_record[26:3] = interv2 then
+			while rec_2[7:2] < "11" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "11" then
+				while rec_2[7:2] < "19" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;	
+			endif;
+		endif;
+			
+// module 6M by second interviewer? 
+		if ct_record[29:3] = interv2 then
+			while rec_2[7:2] < "19" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "19" then
+				while rec_2[7:2] < "27" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;	
+			endif;
+		endif;
+			
+// module 7 by second interviewer? 
+		if ct_record[32:3] = interv2 then
+			while rec_2[7:2] < "27" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "27" then
+				while rec_2[7:2] < "40" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;	
+			endif;
+		endif;
+		
+// module 8 by second interviewer? 
+		if ct_record[32:3] = interv2 then
+			while rec_2[7:2] < "40" do	
+				i = fileread(input_2nd,rec_2);
+			enddo;
+			if rec_2[7:2] = "40" then
+				while rec_2[7:2] < "50" do
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+					i = fileread(input_2nd,rec_2);
+				enddo;
+			endif;
+
+		endif;		
+
+		close(working_file);
+		close(input_1st);
+		close(input_2nd);
+		filecopy(concat("./Data/TEMP_2ND/A",clust_hh,interv2,".dat"),"./Data/RAWD");
+		filedelete(concat("./Data/RAWD/A",clust_hh,interv2,".dat.idx"));
+
+//-------------------------------------------------------------------------------------------------------------
+// _join files preparation for transmission to Supervisor
+	elseif cur_int = 1 then
+		if ct_record[17:3] = interv1 & ct_record[20:3] = interv1 & ct_record[23:3] = interv1 & ct_record[26:3] = interv1 & 
+			ct_record[29:3] = interv1 & ct_record[32:3] = interv1 & ct_record[35:3] = interv1 & ct_record[38:3] = interv1 &
+			ct_record[41:3] = interv1 & ct_record[44:3] = interv1 & ct_record[47:3] = interv1 & ct_record[50:3] = interv1 &
+			ct_record[53:3] = interv1 & ct_record[56:3] = interv1 & ct_record[59:3] = interv1 & ct_record[62:3] = interv1 &
+			ct_record[65:3] = interv1 & ct_record[68:3] = interv1 & ct_record[71:3] = interv1 then 
+			filecopy(concat("./Data/RAWD/A",clust_hh,interv1,".dat"),"./Data/TRANSMISSION");
+			filecopy(concat("./Data/RAWD/G",clust_hh,interv1,".dat"),"./Data/TRANSMISSION");
+		else
+			if interv2 = ct_record[32:3] then { Ag interviewer join - must use a data file that has already gone thru join files for second social interviewer }
+			  filecopy( concat("./Data/TRANSMISSION/A",clust_hh,edit("999",tonumber(interv1)),".dat"), concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv1)),".dat") );
+			  setfile(input_1st,concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+			else
+			  setfile(input_1st,concat("./Data/RAWD/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+			endif;
+
+			setfile(input_2nd,concat("./Data/Temp_2nd/A",clust_hh,edit("999",tonumber(interv2)),".dat"));
+			if ser.eq_id % 10 <> 0 then
+				if fileexist(concat("./Data/TRANSMISSION/A",clust_hh,edit("999",tonumber(interv1)),".dat")) then
+					filedelete(concat("./Data/TRANSMISSION/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+				endif;
+				setfile(working_file,concat("./Data/TRANSMISSION/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+			else		
+				if fileexist(concat("./Data/RECEIVED/A",clust_hh,edit("999",tonumber(interv1)),".dat")) then
+					filedelete(concat("./Data/RECEIVED/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+				endif;
+				setfile(working_file,concat("./Data/TRANSMISSION/A",clust_hh,edit("999",tonumber(interv1)),".dat"));
+			endif;
+			
+			i = fileread(input_1st,rec_1); 
+			if i = 0 then
+				{ENG+} errmsg("Error accessing first data file(1.1)"); {+ENG}
+				{{FR+} errmsg("Erreur lors de l'accès au premier fichier de données (1.1)"); {+FR}}				
+				close(input_1st);
+				close(input_2nd);
+				close(working_file);
+				break;
+			endif;
+			if rec_1[7:2] <> "FL" then
+				{ENG+} errmsg("FL record not found(1.1)"); {+ENG}
+				{{FR+} errmsg("Enregistrement FL non trouvé (1.1)"); {+FR}} 
+				close(input_1st);
+				close(input_2nd);
+				close(working_file);
+				break;
+			endif;
+		
+			i = fileread(input_2nd,rec_2);
+			if i = 0 then
+				{ENG+} errmsg("Error accessing second data file(1.2)"); {+ENG}
+				{{FR+} errmsg("Erreur lors de l'accès au second fichier de données (1.2)"); {+FR}}
+				close(input_1st);
+				close(input_2nd);
+				close(working_file);
+				break;
+			endif;
+			if rec_2[7:2] <> "FL" then
+				{ENG+} errmsg("FL record not found(1.2)"); {+ENG}
+				{{FR+} errmsg("Enregistrement FL non trouvé (1.2)"); {+FR}} 				
+				close(input_1st);
+				close(input_2nd);
+				close(working_file);
+				break;
+			endif;
+
+// Updating FL record { !! TO DO - check positions in ct_record match interviewer assignments and rec_2 match FLOW module in CFTF.dcf }
+			rec_3 = rec_1[1:11];
+			{ Mod 3 }
+			if ct_record[17:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[12:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[12:4]);
+			endif;
+			{ Mod 4 }
+			if ct_record[20:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[16:8]);
+			else
+				rec_3 = concat(rec_3,rec_2[16:8]);
+			endif;
+			{ Mod 5 }
+			if ct_record[23:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[24:8]);
+			else
+				rec_3 = concat(rec_3,rec_2[24:8]);
+			endif;
+			{ Mod 6F }
+			if ct_record[26:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[32:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[32:4]);
+			endif;
+			{ Mod 6M }
+			if ct_record[29:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[36:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[36:4]);
+			endif;
+			if ct_record[32:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[40:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[40:4]);
+			endif;
+			if ct_record[35:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[44:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[44:4]);
+			endif;
+			if ct_record[38:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[48:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[48:4]);
+			endif;
+			if ct_record[41:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[52:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[52:4]);
+			endif;
+			if ct_record[44:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[56:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[56:4]);
+			endif;
+			if ct_record[47:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[60:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[60:4]);
+			endif;
+			if ct_record[50:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[64:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[64:4]);
+			endif;
+			if ct_record[53:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[68:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[68:4]);
+			endif;
+			if ct_record[56:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[72:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[72:4]);
+			endif;
+			if ct_record[59:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[76:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[76:4]);
+			endif;
+			if ct_record[62:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[80:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[80:4]);
+			endif;
+			if ct_record[65:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[84:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[84:4]);
+			endif;
+			if ct_record[68:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[88:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[88:4]);
+			endif;
+			if ct_record[71:3] <> interv2 then
+				rec_3 = concat(rec_3,rec_1[92:4]);
+			else
+				rec_3 = concat(rec_3,rec_2[92:4]);
+			endif;
+
+			i = filewrite(working_file,rec_3);
+			if i = 0 then
+				{ENG+} errmsg("Could not write record (FL)"); {+ENG}
+			    {{FR+} errmsg("Impossible d'écrire l'enregistrement (FL)"); {+FR}}			
+				close(input_1st);
+				close(input_2nd);
+				close(working_file);
+				break;
+			endif;
+		
+			i = fileread(input_1st,rec_1);
+			i = fileread(input_2nd,rec_2);
+		
+			while rec_1[7:2] < "04" do
+				rec_3 = rec_1;
+				i = filewrite(working_file,rec_3);
+				i = fileread(input_1st,rec_1);
+			enddo;
+
+// module 3  { !! TO DO - modify according to record IDs }
+			if ct_record[17:3] <> interv2 then
+				while rec_1[7:2] < "04" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+				if rec_1[7:2] = "04" then
+					rec_3 = rec_1;			
+					i = filewrite(working_file,rec_3);
+				endif;
+			else
+				while rec_2[7:2] < "04" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+				if rec_2[7:2] = "04" then
+					rec_3 = rec_2;			
+					i = filewrite(working_file,rec_3);
+				endif;
+			endif;
+// module 4  
+			if ct_record[20:3] <> interv2 then
+				while rec_1[7:2] < "05" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+					while rec_1[7:2] < "08" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;	
+			else
+				while rec_2[7:2] < "05" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+					while rec_2[7:2] < "08" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;	
+			endif;
+		
+// module 5  
+			if ct_record[23:3] <> interv2 then
+				while rec_1[7:2] < "08" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+					while rec_1[7:2] < "11" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;	
+			else
+				while rec_2[7:2] < "08" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+					while rec_2[7:2] < "11" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;	
+			endif;
+	
+// module 6F  
+			if ct_record[26:3] <> interv2 then
+				while rec_1[7:2] < "11" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+				if rec_1[7:2] = "11" then
+					while rec_1[7:2] < "19" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;	
+				endif;
+			else
+				while rec_2[7:2] < "11" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+				if rec_2[7:2] = "11" then
+					while rec_2[7:2] < "19" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;	
+				endif;
+			endif;
+
+// module 6M 
+			if ct_record[29:3] <> interv2 then
+				while rec_1[7:2] < "19" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+				if rec_1[7:2] = "19" then
+					while rec_1[7:2] < "27" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;	
+				endif;
+			else
+				while rec_2[7:2] < "19" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+				if rec_2[7:2] = "19" then
+					while rec_2[7:2] < "27" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;	
+				endif;
+			endif;
+
+// module 7 
+			if ct_record[13:3] <> interv2 then
+				while rec_1[7:2] < "27" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+				if rec_1[7:2] = "27" then
+					while rec_1[7:2] < "41" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;	
+				endif;
+			else
+				while rec_2[7:2] < "28" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+				if rec_2[7:2] = "27" then
+					while rec_2[7:2] < "40" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;	
+				endif;
+			endif;
+// module 8 
+			if ct_record[71:3] <> interv2 then
+				while rec_1[7:2] < "40" do	
+					i = fileread(input_1st,rec_1);
+				enddo;
+				if rec_1[7:2] = "40" then
+					while rec_1[7:2] < "50" do
+						rec_3 = rec_1;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_1st,rec_1);
+					enddo;
+				endif;
+
+			else
+				while rec_2[7:2] < "40" do	
+					i = fileread(input_2nd,rec_2);
+				enddo;
+				if rec_2[7:2] = "40" then
+					while rec_2[7:2] < "50" do
+						rec_3 = rec_2;			
+						i = filewrite(working_file,rec_3);
+						i = fileread(input_2nd,rec_2);
+					enddo;
+				endif;
+
+			endif;
+
+			close(input_1st);
+			close(input_2nd);
+			close(working_file);
+			fileconcat(concat("./DATA/TRANSMISSION/O",clust_hh,edit("999",tonumber(interv1)),".dat"),
+						concat("./Data/RAWD/O",clust_hh,edit("999",tonumber(interv1)),".dat"),
+						concat("./Data/Temp_2nd/O",clust_hh,edit("999",tonumber(interv2)),".dat"));
+		endif;
+	endif;
+	break;
+enddo;	
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Receive initial data from first interviewer (Header + HH roster)
+
+function en_trans_from_1st(alpha(6) clust_hh, first_interv )
+
+
+	errmsg(11050);
+
+  if !syncconnect( Bluetooth ) then
+    errmsg( 11053 );
+	en_trans_from_1st = 0;
+	lrc = 0;
+  else
+    syncfile( GET, concat("./DATA/CONTROL/CT",clust_hh,".dat"), "../DATA/CONTROL/"); 
+    syncfile( GET, concat("./DATA/RAWD/A",clust_hh,edit("999",first_interv),".dat"), "../DATA/TEMP_2ND/"); 
+    
+	syncdisconnect();
+	errmsg(11052);
+	en_trans_from_1st = 1;
+	lrc = 1;
+  
+  endif;
+
+//check if this interviewer is the correct
+
+	sec_enum = 0;
+	if lrc = 1 then
+		f_name = concat("Data/Control/CT",clust_hh,".dat");
+		if fileexist(f_name) then
+			setfile(input_ct,f_name);
+			fileread(input_ct,ct_record);
+			close(input_ct);							
+			if tonumber(ct_record[10:3]) = tonumber(cod_oper) | tonumber(ct_record[13:3]) = tonumber(cod_oper) then
+				sec_enum = 1;
+			else
+				errmsg(11010,edit("999",tonumber(ct_record[10:3])),edit("999",tonumber(ct_record[13:3])));
+			endif;		
+		else
+			errmsg(11014, f_name)
+		endif;
+	endif;
+		
+	if lrc = 1 & sec_enum = 1 then
+		if !fileexist(concat("./Data/Rawd/A",clust_hh,cod_oper,".dat")) then 
+			filecopy(concat("./Data/TEMP_2ND/A",clust_hh,edit("999",first_interv),".dat"),
+					concat("./Data/RAWD/A",clust_hh,cod_oper,".dat"));
+		else 
+			en_join_files(clust_hh,edit("999",first_interv),cod_oper,2);
+		endif;
+	endif;	
+
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Send data to first interviewer 
+
+function en_trans_to_1st(alpha(6) clust_hh, alpha(3) second_interv )
+
+  errmsg(11050);
+
+  if !syncconnect( Bluetooth ) then
+    errmsg( 11053 );
+	en_trans_to_1st = 0;
+	lrc = 0;
+  else
+    syncfile( PUT, concat("../DATA/RAWD/A",clust_hh,second_interv,".dat"), "./DATA/TEMP_2ND/");
+    syncfile( PUT, concat("../DATA/RAWD/O",clust_hh,second_interv,".dat"), "./DATA/TEMP_2ND/");
+    
+	syncdisconnect();
+	errmsg(11052);
+	en_trans_to_1st = 1;
+	lrc = 1;
+  
+  endif;
+  
+end;
+
+
+
+{ ------------------------------------------------------------------ }
+// Prepare data for transmission - second part
+function en_prepare2(cur_hh) 
+  m = 0;				{ 1st interview completed } 
+  l = 0;				{ situation at end }
+  setfile(input_ct,concat(".\DATA\CONTROL\CT",edit("999",ser.c_cluster),edit("999",cur_hh),".dat"));
+  lrc = fileread(input_ct,ct_record); 
+  close(input_ct);
+  if lrc = 1 then		{ file exist }
+    if ct_record[16:1] = "1" then				{ at least the HH roster is completed } 
+	  { check if HH is completed by 1st interviewer }
+	  setfile(working_file,concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat")); 
+	  lrc = fileread(working_file,c_j);		{ FL record }
+	  lrc = fileread(working_file,c_j);		{ 00 record }
+	  close(working_file);
+	  if lrc = 1 then 
+	    if c_j[129:1] = "1" then { !! TO DO - set start of c_j to location of AHCONSENT in CFTF.dcf !! this is checking whether consent was given }
+		  m = 1;       
+		endif;
+	  endif;
+	endif;
+  endif;
+
+  if m = 0 then { "incomplete" households - refused, extended absence, etc } 
+    if ser.eq_id % 10 <> 0 then 
+      filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+				    ".\DATA\TRANSMISSION");
+	  filecopy(concat(".\DATA\RAWD\O",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					".\DATA\TRANSMISSION");
+	  filecopy(concat(".\DATA\RAWD\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					".\DATA\TRANSMISSION");
+	  filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat.not"),
+					".\DATA\TRANSMISSION");
+    else { supervisor transfer }  
+	  filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					".\DATA\RECEIVED");
+	  filecopy(concat(".\DATA\RAWD\O",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					".\DATA\RECEIVED");
+	  filecopy(concat(".\DATA\RAWD\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					".\DATA\RECEIVED");
+	  filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat.not"),
+					".\DATA\RECEIVED");
+	  if choice <> 12 then errmsg( 11054 ); endif;
+    endif;
+  endif;
+  
+
+
+  if m = 1 then						{ first and second module was completed } 
+    if ct_record[17:3] = edit("999",ser.eq_id) & 
+	   ct_record[20:3] = ct_record[7:3] & { !! TO DO - modify the number of these checks to match number of modules }
+	   ct_record[23:3] = ct_record[7:3] & 
+	   ct_record[26:3] = ct_record[7:3] & 
+	   ct_record[29:3] = ct_record[7:3] & 
+	   ct_record[32:3] = ct_record[7:3] & 
+	   ct_record[35:3] = ct_record[7:3] & 
+	   ct_record[38:3] = ct_record[7:3] & 
+	   ct_record[41:3] = ct_record[7:3] & 
+	   ct_record[44:3] = ct_record[7:3] & 
+	   ct_record[47:3] = ct_record[7:3] & 
+	   ct_record[50:3] = ct_record[7:3] & 
+	   ct_record[53:3] = ct_record[7:3] & 
+	   ct_record[56:3] = ct_record[7:3] & 
+	   ct_record[59:3] = ct_record[7:3] & 
+	   ct_record[62:3] = ct_record[7:3] & 
+	   ct_record[65:3] = ct_record[7:3] & 
+	   ct_record[68:3] = ct_record[7:3] & 
+	   ct_record[71:3] = ct_record[7:3] then
+         l = 1;			{ no second interviewer }
+	else
+      if ct_record[10:3] <> "   " then { !! TO DO - check location of second interviewer code... second/Ag interviewers have been assigned }
+        { check if HH is completed by 1st interviewer }
+		setfile(working_file,concat(".\DATA\TEMP_2ND\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[10:3])),".dat"));
+		lrc = fileread(working_file,c_j);		{ FL record }
+		lrc = fileread(working_file,c_j);		{ 00 record }
+		close(working_file);
+		if lrc = 1 then
+		  if c_j[129:1] = "1" then { !! TO DO - set start of c_j to location of AHCONSENT in CFTF.dcf !! this is checking whether consent was given }
+		    l = 2;
+		  endif;
+		else
+		  errmsg( 11055 ); { unable to access Interviewer B's data }
+		endif;
+	  endif;
+      if ct_record[13:3] <> "   " then { !! TO DO - check location of second interviewer code... second/Ag interviewers have been assigned }
+        { check if HH is completed by 1st interviewer }
+		setfile(working_file,concat(".\DATA\TEMP_2ND\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[13:3])),".dat"));
+		lrc = fileread(working_file,c_j);		{ FL record }
+		lrc = fileread(working_file,c_j);		{ 00 record }
+		close(working_file);
+		if lrc = 1 then
+		  if c_j[129:1] = "1" then { !! TO DO - set start of c_j to location of AHCONSENT in CFTF.dcf !! this is checking whether consent was given }
+		    l = 2;
+		  endif;
+		else
+		  errmsg( 11056 ); { unable to access Ag Interviewers data }
+		endif;
+	  endif;
+    endif;
+	if l = 1 then { no second interviewer }
+	  if ser.eq_id % 10 <> 0 then 
+	    filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+					    ".\DATA\TRANSMISSION");
+		filecopy(concat(".\DATA\RAWD\O",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\TRANSMISSION");
+		filecopy(concat(".\DATA\RAWD\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\TRANSMISSION");
+		filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat.not"),
+						".\DATA\TRANSMISSION");
+	  else { supervisor transfer }
+		filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\RAWD\O",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\RAWD\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\RAWD\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat.not"),
+						".\DATA\RECEIVED");
+		errmsg( 11054 );
+	  endif;
+	elseif l = 2 then
+	  en_join_files(concat(edit("999",ser.c_cluster),edit("999",cur_hh)),ct_record[7:3],edit("999",tonumber(ct_record[10:3])),1);
+	  if ct_record[13:3] <> "   " then  { if no ag modules needed in household }
+	    en_join_files(concat(edit("999",ser.c_cluster),edit("999",cur_hh)),ct_record[7:3],edit("999",tonumber(ct_record[13:3])),1);
+          endif;
+	  filecopy(concat(".\DATA\RAWD\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\TRANSMISSION");
+	  if ser.eq_id % 10 = 0 then 
+  		filecopy(concat(".\DATA\TRANSMISSION\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\TRANSMISSION\O",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\TRANSMISSION\G",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat"),
+						".\DATA\RECEIVED");
+		filecopy(concat(".\DATA\TRANSMISSION\A",edit("999",ser.c_cluster),edit("999",cur_hh),edit("999",tonumber(ct_record[7:3])),".dat.not"),
+						".\DATA\RECEIVED");
+		errmsg( 11054 );
+   	    filedelete("Data/TRANSMISSION/*.*");
+   	  endif;
+
+	endif;			
+  endif;	
+end;
+
+{ ------------------------------------------------------------------ }
+// Prepare data for transmission select only completed HHs
+function en_prepare() 
+    cluster_c = edit("999",c_cluster);
+	i = loadcase(clusters,cluster_c);
+	i = loadcase(ctrl_cluster,cluster_c);
+
+	do varying ii = 1 until ii > clusters.ytothh 
+		if ctrl_cluster.enum(ii) = ser.eq_id then	{ check if this HH was selected to this interviewer }
+			{ check if this HH is in condition to be sent to the supervisor/team leader }
+			en_prepare2(ctrl_cluster.hh(ii));
+		endif;
+	enddo;		
+end;
+
+
+
+{ ------------------------------------------------------------------ }
+// PFF generation for data entry process 
+// en_genpff(c_cluster,$,0,i);
+function en_genpff(apptype,CL_NO,HH_NO,partial)
+	app_folder = "ENTRY";
+	if apptype = 1 then
+		prefix = "A";
+		app = "CFTF";
+	elseif apptype = 2 then
+		app = "SECONDASSIGN";
+	elseif apptype = 3 then
+		app = "SECONDMODULE";
+		prefix = "A";
+    	elseif apptype = 4 then
+		prefix = "A";
+    	app = "LISTELIG";
+	endif;
+		
+
+	eq_id_c = edit("999",ser.eq_id);
+	cluster_c = edit("999",CL_NO);
+	hh_c = edit("999",hh_no);
+
+// Verify if the file exist, in case yes, delete this old file
+	if fileexist(concat(".\",strip(f_name))) = 1 then
+		filedelete(concat(".\",strip(f_name)));
+	endif;
+
+// generation of the new file
+	file_status = setfile(working_file,concat(".\",strip(f_name)));
+
+// lines generation 
+	filewrite(working_file," ");
+	filewrite(working_file,"[Run Information]");
+	filewrite(working_file, "Version=CSPro 7.2");
+	filewrite(working_file, "AppType=Entry");
+	filewrite(working_file, "[DataEntryInit]");
+	filewrite(working_file, concat("OperatorID=", edit("999",ser.eq_id)));
+
+	{ no StartMode for modify }
+	if cl_no = 0 then
+		filewrite(working_file, "StartMode=ADD");
+	else
+		filewrite(working_file, "StartMode=ADD;%s",concat(cluster_c,hh_c));
+	endif;
+	filewrite(working_file, "Lock=Verify");
+	filewrite(working_file, "NoFileOpen=Yes");
+	filewrite(working_file, "[Files]");
+
+// application name
+	filewrite(working_file, concat("Application=..\", strip(app_folder), "\", strip(app), ".ent"));
+		
+// data file
+	if apptype = 1 then
+		filewrite(working_file, concat("InputData=", "..\DATA\RAWD\", prefix,cluster_c,hh_c,eq_id_c,".dat"));
+	elseif apptype in 2:5 then
+		filewrite(working_file, concat("InputData=", "..\ENTRY\NULL.dat"));
+	endif;
+
+// External lookup files
+	if apptype = 1 then
+		filewrite(working_file, "[ExternalFiles]");
+		filewrite(working_file, concat("INTERV=", "..\LOOKUP\", "interv.dat")); 	{Interviewer and supervisor information data}
+		filewrite(working_file, concat("SER=","..\LOOKUP\", "serial.dat")); 		{Interviewer and supervisor information data}
+		filewrite(working_file, concat("CLUSTERS=","..\LOOKUP\", "clusters.dat")); 	{Sample file}
+		filewrite(working_file, concat("CTRL_HH=","..\DATA\CONTROL\", "CT",cluster_c,hh_c,".dat")); 	{Control modules file}
+		filewrite(working_file, concat("OTHERS=","..\DATA\RAWD\", "O",cluster_c,hh_c,eq_id_c,".dat")); 	{OTHERS file}
+		filewrite(working_file, concat("HH_GPS=","..\DATA\RAWD\", "G",cluster_c,hh_c,eq_id_c,".dat")); 	{GPS file}
+	elseif apptype in 2,4 then
+		filewrite(working_file, "[ExternalFiles]");
+		filewrite(working_file, concat("INTERV=", "..\LOOKUP\", "interv.dat")); 	{Interviewer and supervisor information data}
+		filewrite(working_file, concat("CTRL_HH=", "..\DATA\CONTROL\CT", cluster_c,hh_c,".dat")); 	{HH control file }
+	elseif apptype = 3 then			{ Assign modules to 2nd interviewer }
+		filewrite(working_file, "[ExternalFiles]");
+		filewrite(working_file, concat("INTERV=", "..\LOOKUP\", "interv.dat")); 	{Interviewer and supervisor information data}
+		filewrite(working_file, concat("CTRL_HH=", "..\DATA\CONTROL\CT", cluster_c,hh_c,".dat")); 	{HH control file }
+		filewrite(working_file, concat("CFTF=", "..\DATA\RAWD\", prefix,cluster_c,hh_c,eq_id_c,".dat")); 	{HH control file }
+	elseif apptype = 5 then			{ List eligibles }
+		filewrite(working_file, "[ExternalFiles]");
+		filewrite(working_file, concat("CFTF=", "..\DATA\RAWD\", prefix,cluster_c,hh_c,eq_id_c,".dat")); 	{HH control file }
+	endif;
+
+// parameters sent to the application
+	filewrite(working_file, "[Parameters]");
+	if apptype = 1 then
+//Parameter=ccchhhiiipsss0	ccc=cluster,hhh=hh,iii=interviewer code,p=partial,sss=supervisor,0=from interviewer program
+		filewrite(working_file, concat("Parameter=",cluster_c,hh_c,eq_id_c,edit("9",partial),edit("99",ser.team_id),"0","0")); 
+	elseif apptype in 2:5 then
+		filewrite(working_file, concat("Parameter=",cluster_c,hh_c,eq_id_c)); 
+	endif;
+
+	close(working_file);
+end;
+
+
+function en_backup()
+
+// 1. Verify if the flash memory is available
+	c_i = pathname(CSEntryExternal);
+	if c_i[1:1] = "<" then
+		{ENG+} errmsg("Flash memory is not available for backup"); {+ENG}
+		{{FR+} errmsg("La mémoire flash n'est pas disponible pour la sauvegarde"); {+FR}}		
+	else
+			
+// 2. Verify if the data folder for this teamviewer exist in the flash, in case NO, create all the folders
+		i = 0;
+		c_j = concat(c_i,"data",edit("999",ser.eq_id));
+		if !direxist(c_j) then 
+			if !dircreate(c_j) then
+				{ENG+} errmsg("%s folder could not be created, process aborted",c_j); {+ENG}
+				{{FR+} errmsg("Le dossier %s n'a pas pu être créé, processus interrompu",c_j); {+FR}}				
+				inc(i);
+			endif;
+			if !dircreate(concat(c_j,"/RAWD")) then
+				{ENG+} errmsg("%s folder could not be created, process aborted",concat(c_j,"/RAWD")); {+ENG}
+				{{FR+} errmsg("Le dossier %s n'a pas pu être créé, processus interrompu",concat(c_j,"/RAWD")); {+FR}}				
+				inc(i);
+			endif;
+			if !dircreate(concat(c_j,"/CONTROL")) then
+				{ENG+} errmsg("%s folder could not be created, process aborted",concat(c_j,"/CONTROL")); {+ENG}
+				{{FR+} errmsg("Le dossier %s n'a pas pu être créé, processus interrompu",concat(c_j,"/CONTROL")); {+FR}}				
+				inc(i);
+			endif;
+			if !dircreate(concat(c_j,"/LOOKUP")) then
+				{ENG+} errmsg("%s folder could not be created, process aborted",concat(c_j,"/LOOKUP")); {+ENG}
+				{{FR+} errmsg("Le dossier %s n'a pas pu être créé, processus interrompu",concat(c_j,"/LOOKUP")); {+FR}}				
+				inc(i);
+			endif;
+		endif;
+
+// 3. copy the files to the flash memory
+// 3.1 copy RAWD data
+		if i = 0 then
+			if !filecopy("./DATA/RAWD/*.*",concat(c_j,"/RAWD")) then
+				{ENG+} errmsg("Error writing %s data to flash memory","RAWD"); {+ENG}
+				{{FR+} errmsg("Erreur d'écriture des données %s dans la mémoire flash","RAWD"); {+FR}}				
+				inc(i);
+			endif;
+		
+// 3.4 copy CONTROL data
+			if !filecopy("./DATA/CONTROL/*.*",concat(c_j,"/CONTROL")) then
+				{ENG+} errmsg("Error writing %s data to flash memory","CONTROL"); {+ENG}
+				{{FR+} errmsg("Erreur d'écriture des données %s dans la mémoire flash","CONTROL"); {+FR}}				
+				inc(i);
+			endif;
+		
+// 3.5 copy LOOKUP data
+			if !filecopy("./LOOKUP/*.*",concat(c_j,"/LOOKUP")) then
+				{ENG+} errmsg("Error writing %s data to flash memory","LOOKUP"); {+ENG}
+				{{FR+} errmsg("Erreur d'écriture des données %s dans la mémoire flash","LOOKUP"); {+FR}}				
+				inc(i);
+			endif;
+		endif;
+// 4. End of the process, send msg
+		if i = 0 then
+			{ENG+} errmsg("Data backup to flash memory successful!"); {+ENG}
+			{{FR+} errmsg("Sauvegarde des données sur mémoire flash réussie!"); {+FR}}			
+		else
+			{ENG+} errmsg("Not all data properly backed up - review previous messages."); {ENG}
+			{{FR+} errmsg("Toutes les données ne sont pas correctement sauvegardées. Consultez les messages précédents."); {+FR}}			
+		endif;
+	endif;
+end;
+
+  { Creates a copy of the prior backup before backing up current data if prior backup was bigger }
+  function backupn( questype );
+    if FileExist( concat( strip(backup), "/", "AO"[questype:1], strip(xfilenum), ".dat") ) &
+       FileSize ( concat( strip(backup), "/", "AO"[questype:1], strip(xfilenum), ".dat") ) >
+       FileSize ( concat( strip(data)  , "/", "AO"[questype:1], strip(xfilenum), ".dat") ) then
+
+      do n = 1 while FileExist( concat( strip(backup), "/", "AO"[questype:1], strip(xfilenum), "_", edit("99",n), ".dat" ) ) enddo;
+
+      FileCopy( concat( strip(backup), "/", "AO"[questype:1], strip(xfilenum), ".dat" ),
+                concat( strip(backup), "/", "AO"[questype:1], strip(xfilenum), "_", edit("99",n), ".dat" ) );
+      FileCopy( concat( strip(data), "/", "AO"[questype:1], strip(xfilenum), ".dat" ),
+                concat( strip(data), "/", "AO"[questype:1], strip(xfilenum), "_", edit("99",n), ".dat" ) );
+    endif;
+  end;
+
+  { makes a backup as soon as the interview is completed }
+  { copies all households, individual, others and any related file }
+  function backupf( hhnumber )
+    xfilenum = concat(cluster_c,edit("999",hhnumber),cod_oper);
+    { eliminates files not required }
+      FileDelete( concat( strip(data), "/?", strip(xfilenum), ".dat.lst" ) );
+      FileDelete( concat( strip(data), "/?", strip(xfilenum), ".dat.log" ) );
+{   FileDelete( concat( strip(data), "\?", strip(xfilenum), ".idx" ) );  keep an eye on this }
+
+      { added extra protection - if data file reduces in size }
+      do i = 1 while i <= 2
+        backupn(i)
+      enddo;
+      FileCopy( concat( strip(data),"/?",strip(xfilenum), ".dat" ), strip(backup) );
+  end;
+
+// Entry dataentry process menu for main interviewer 
+function en_getresult()  
+  if fileexist( concat("..\Data\RAWD\A", edit("999",ser.c_cluster), edit("999",curr_hh), edit("999",ser.eq_id), ".DAT" ) ) then
+    setfile( CTRL_HH, strip(concat("..\DATA\CONTROL\CT",edit("999",ser.c_cluster),edit("999",curr_hh),".DAT") ) ); 
+    setfile( CFTF, strip(concat("..\Data\RAWD\A", edit("999",ser.c_cluster), edit("999",curr_hh), edit("999",ser.eq_id), ".DAT" ) ) );
+    if loadcase( CFTF ) then
+      en_getresult = AHRESULT;
+      if AHRESULT = 11 then
+        en_getresult = 6;
+      endif;
+      if loadcase( CTRL_HH ) then 
+        if AHRESULT = 1 & H_MOD1 = 0 then
+          en_getresult = 6;
+        endif;
+      endif;
+    else
+       if i in 1:96 then en_getresult = i; else en_getresult = 0; endif;
+    endif;
+  else
+    en_getresult = 0;
+  endif;
+end;
+
+{ ------------------------------------------------------------------ }
+// Verify if module HH roster is completed
+function en_verif_mod1(hh_pos)
+	f_name = concat("Data/Control/CT",edit("999",ser.c_cluster),edit("999",ctrl_cluster.hh(hh_pos)),".dat");
+	setfile(working_file,f_name);
+	if !fileexist(working_file) then
+		{ENG+} errmsg("File=%s, could not open, process cancelled",f_name); {+ENG}
+		{{FR+} errmsg("Fichier=%s, impossible d'ouvrir, processus annulé",f_name); {+FR}}		
+		stop(1);
+	endif;	
+	fileread(working_file,c_i);
+	close(working_file);
+	if c_i[16:1] <> "1" then { !! TO DO - check that this location is where H_MOD1 is in CTRL_HH.dcf }
+		en_verif_mod1 = 0;
+	else
+		if ( c_i[10:3] <> "   " | c_i[13:3] <> "   " ) & (c_i[17:3] in c_i[10:3], c_i[13:3] |
+								c_i[20:3] in c_i[10:3], c_i[13:3] |
+								c_i[23:3] in c_i[10:3], c_i[13:3] |
+								c_i[26:3] in c_i[10:3], c_i[13:3] |
+								c_i[29:3] in c_i[10:3], c_i[13:3] |
+								c_i[32:3] in c_i[10:3], c_i[13:3] |
+								c_i[35:3] in c_i[10:3], c_i[13:3] |
+								c_i[38:3] in c_i[10:3], c_i[13:3] |
+								c_i[41:3] in c_i[10:3], c_i[13:3] |
+								c_i[44:3] in c_i[10:3], c_i[13:3] |
+								c_i[47:3] in c_i[10:3], c_i[13:3] |
+								c_i[50:3] in c_i[10:3], c_i[13:3] |
+								c_i[53:3] in c_i[10:3], c_i[13:3] |
+								c_i[56:3] in c_i[10:3], c_i[13:3] |
+								c_i[59:3] in c_i[10:3], c_i[13:3] |
+								c_i[62:3] in c_i[10:3], c_i[13:3] |
+								c_i[65:3] in c_i[10:3], c_i[13:3] |
+								c_i[68:3] in c_i[10:3], c_i[13:3] |
+								c_i[71:3] in c_i[10:3], c_i[13:3] ) then
+			en_verif_mod1 = 1;
+		else
+			en_verif_mod1 = 2;
+		endif;
+	endif;
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Entry dataentry process menu for main interviewer 
+function en_entry_enum1(hh_pos)
+
+// find file ctccchhh.dat in /data/control folder
+	curr_hh = ctrl_cluster.hh(hh_pos);
+	f_name = concat("../Data/Control/CT",edit("999",ser.c_cluster),edit("999",ctrl_cluster.hh(hh_pos)),".dat");
+	if !fileexist(f_name) then
+ 	  setfile(working_file,f_name);
+	  if ISEX = 2 then
+
+ 		filewrite(working_file,concat(edit("999",ser.c_cluster), { !!! CS Note: Number of lines below must be modified for addition/subtraction of modules !!! }
+									edit("999",ctrl_cluster.hh(hh_pos)),
+									edit("999",ser.eq_id),	{ first interviewer code }
+									"   ",					{ second interviewer code }
+									"   ",					{ Ag interviewer code }
+									"0",					{ mod 1 completed }
+									edit("999",eq_id),		{ interviewer assigned for mod 3 }
+									edit("999",eq_id),		{ interviewer assigned for mod 4 }
+									edit("999",eq_id),		{ interviewer assigned for mod 5 }
+									edit("999",eq_id),		{ interviewer assigned for mod 6F }
+									edit("999",eq_id),		{ interviewer assigned for mod 6M }
+									edit("999",0),		{ interviewer assigned for mod 7.90 }
+									edit("999",0),		{ interviewer assigned for mod 7.1 }
+									edit("999",0),		{ interviewer assigned for mod 7.2 }
+									edit("999",0),		{ interviewer assigned for mod 7.3 }
+									edit("999",0),		{ interviewer assigned for mod 7.4 }
+									edit("999",0),		{ interviewer assigned for mod 7.5 }
+									edit("999",0),		{ interviewer assigned for mod 7.6 }
+									edit("999",0),		{ interviewer assigned for mod 7.7 }
+									edit("999",0),		{ interviewer assigned for mod 7.50 }
+									edit("999",0),		{ interviewer assigned for mod 7.80 }
+									edit("999",0),		{ interviewer assigned for mod 7.91 }
+									edit("999",0),		{ interviewer assigned for mod 7.92 }
+									edit("999",0),		{ interviewer assigned for mod 7.96 }
+									edit("999",eq_id)));	{ interviewer assigned for mod 8 }
+
+      else
+ 		filewrite(working_file,concat(edit("999",ser.c_cluster), { !!! CS Note: Number of lines below must be modified for addition/subtraction of modules !!! }
+									edit("999",ctrl_cluster.hh(hh_pos)),
+									edit("999",ser.eq_id),	{ first interviewer code }
+									"   ",					{ second interviewer code }
+									"   ",					{ Ag interviewer code }
+									"0",					{ mod 1 completed }
+									edit("999",eq_id),		{ interviewer assigned for mod 3 }
+									edit("999",0),		{ interviewer assigned for mod 4 suggested to be female }
+									edit("999",eq_id),		{ interviewer assigned for mod 5 }
+									edit("999",0),		{ interviewer assigned for mod 6F must be female }
+									edit("999",eq_id),		{ interviewer assigned for mod 6M }
+									edit("999",0),		{ interviewer assigned for mod 7.90 }
+									edit("999",0),		{ interviewer assigned for mod 7.1 }
+									edit("999",0),		{ interviewer assigned for mod 7.2 }
+									edit("999",0),		{ interviewer assigned for mod 7.3 }
+									edit("999",0),		{ interviewer assigned for mod 7.4 }
+									edit("999",0),		{ interviewer assigned for mod 7.5 }
+									edit("999",0),		{ interviewer assigned for mod 7.6 }
+									edit("999",0),		{ interviewer assigned for mod 7.7 }
+									edit("999",0),		{ interviewer assigned for mod 7.50 }
+									edit("999",0),		{ interviewer assigned for mod 7.80 }
+									edit("999",0),		{ interviewer assigned for mod 7.91 }
+									edit("999",0),		{ interviewer assigned for mod 7.92 }
+									edit("999",0),		{ interviewer assigned for mod 7.96 }
+									edit("999",eq_id)));	{ interviewer assigned for mod 8 }
+     endif;      
+	 close(working_file);							
+
+	endif;
+  if main = 1 then
+	always = 1;
+	while always = 1 do
+		{ENG+} choice2 = accept(concat("Data entry menu, Interviewer: (",cod_oper,") ",strip(iname)),
+					concat("Cluster: ",edit("999",ser.c_cluster)," - ",
+					"Household: ",edit("999",ctrl_cluster.hh(hh_pos))),			{1}
+					"============ Main options =============",					{2}
+					"1. Start new household",									{3}
+					"2. Revisit incomplete household",							{4}
+					"3. Modify completed household",							{5}					
+					"=====================================",					{6}
+					"4. Return to Main menu");									{7}
+		 {+ENG}
+         {{FR+} choice2 = accept (concat ("menu de saisie de données, enquêteur: (", cod_oper, ")", strip (iname)),
+                    concat ("Grappe:", edit ("999", ser.c_cluster), "-",
+                    "Ménage:", edit("999", ctrl_cluster.hh (hh_pos))), {1}
+                    "============ Options principales =============", {2}
+                    "1. Commencer un nouveau ménage", {3}
+                    "2. Revisitez le ménage incomplet", {4}
+                    "3. Modifier le ménage terminé", {5}
+                    "====================================", {6}
+                    "4. Retour au menu principal"); {7}
+        {+FR}}
+		if choice2 in 3:5 then 		{ Call dataentry process new HH}
+			j = 1;
+			i = en_getresult();	
+			if choice2 = 3 then
+    			if i <> 0 then
+      				errmsg( 11007, curr_hh, i);
+					j = 0;
+    			endif;
+// generate pff file for dataentry
+
+			elseif choice2 = 4 then
+				if i in 0, 1 then
+      				errmsg(11008, curr_hh, i);
+					j = 0;
+				endif; 
+// generate pff file for dataentry
+
+			else					{ choice2 = 5 = modify }
+				if i <> 1 then
+					errmsg(11009, curr_hh,i );
+					j = 0;
+				endif;
+			endif;
+// call the data entry program
+			if j = 1 then
+			  backupf( ctrl_cluster.hh (hh_pos) );
+			  f_name = "application.pff";
+			  en_genpff(1,c_cluster,curr_hh,i);
+			  execPFF(strip(f_name),stop);
+			  stop(1);		
+			endif;
+			
+		elseif choice2 = 7 then 	{ return main menu }
+			always = 0;
+		endif;
+
+	enddo;
+
+  elseif main = 2 then
+	always2 = 1;
+	while always2 = 1 do	
+		{ENG+} choice5 = accept(concat("Secondary interviewer menu, Interviewer A: (",cod_oper,") ",strip(iname)),
+					concat("Cluster: ",edit("999",ser.c_cluster)," - ",
+					"Household: ",edit("999",ctrl_cluster.hh(hh_pos))),			{1}
+					"1. Choose secondary interviewers",								{2}
+					"2. Assign modules to secondary interviewers",						{3}
+					"3. Send assignment to secondary interviewers", 					{4}
+					"4. Receive data from secondary interviewers", 					{5}
+					"==========================================",				{6}
+					"5. Return to Main menu");									{7}						
+	    {+ENG}
+        {{FR+} choice5 = accept (concat ("Menu de l'enquêteur secondaire, Enquêteur A: (", cod_oper, ")", strip (iname)),
+                    concat ("Grappe:", edit ("999", ser.c_cluster), "-",
+                    "Ménage:", edit("999", ctrl_cluster.hh (hh_pos))), {1}
+                    "1. Choisissez des enquêteurs secondaires", {2}
+                    "2. Affecter des modules aux enquêteurs secondaires", {3}
+                    "3. Envoyer le travail aux enquêteurs secondaires", {4}
+                    "4. Recevoir les données des enquêteurs secondaires", {5}
+                    "========================================", {6}
+                    "5. Retour au menu principal"); {7}
+        {+FR}}
+			
+			if choice5 = 2 then 		{ Assign 2nd interviewer }
+			  if !en_verif_mod1(hh_pos) then
+			    errmsg(11011);
+			  else	
+				f_name = "application.pff";
+				en_genpff(2,c_cluster,curr_hh,0);
+				execPFF(strip(f_name),stop);
+				stop(1);		
+			  endif;
+
+		elseif choice5 = 3 then 		{ assign modules to 2nd interviewer }
+			if !en_verif_mod1(hh_pos) then
+				errmsg(11012);
+			else	
+				f_name = "application.pff";
+				en_genpff(3,c_cluster,curr_hh,0);
+				execPFF(strip(f_name),stop);
+			endif;
+
+		elseif choice5 in 4,5 then 	{ send initial data to 2nd and receive data from 2nd. In both cases 1st acts as server }
+			if en_verif_mod1(hh_pos) = 0 then
+				errmsg(11013);
+			elseif en_verif_mod1(hh_pos) = 2 then 
+				errmsg(11015);
+			else
+				en_trans_to_2nd();
+			endif;
+		elseif choice5 = 7 then 	{ return main menu }
+			always2 = 0;
+		endif;			
+	enddo;
+  endif;
+end;
+
+
+
+{ ------------------------------------------------------------------ }
+// Entry dataentry process menu for 2nd interviewer 
+function en_2nd_completed(alpha(6) clust_hh, alpha(3) interv2)
+	setfile(working_file,concat("./Data/RAWD/A",clust_hh,interv2,".dat"));
+	open(working_file);
+	i = fileread(working_file,c_j);
+	if i = 0 then
+		{ENG+} errmsg("Error retrieving case (en_2nd_completed),%s",concat("./Data/RAWD/A",clust_hh,interv2,".dat")); {+ENG}
+		{{FR+} errmsg("Erreur lors de la récupération du cas (en_2nd_completed),%s",concat("./Data/RAWD/A",clust_hh,interv2,".dat")); {+FR}}
+		en_2nd_completed = 0;
+	else
+		i = fileread(working_file,c_j);
+		if c_j[7:2] <> "00" then 
+			{ENG+} errmsg("Error retrieving record (00) (en_2nd_completed)"); {+ENG}
+			{{FR+} errmsg("Erreur lors de la récupération de l'enregistrement (00) (en_2nd_completed)"); {+FR}}
+			en_2nd_completed = 0;
+		elseif c_j[129:1] <> "1" then { !! TO DO - check location of consent ( GD ) }
+			errmsg(11017);		
+			en_2nd_completed = 0;
+		else	
+			en_2nd_completed = 1;
+		endif;
+	endif;
+	close(working_file);
+end;
+
+
+{ ------------------------------------------------------------------ }
+// Entry dataentry process menu for 2nd interviewer 
+function en_entry_enum2(hh_pos)
+
+// find file ctccchhh.dat in /data/control folder
+	curr_hh = ctrl_cluster.hh(hh_pos);
+	f_name = concat("./Data/Control/CT",edit("999",ser.c_cluster),edit("999",ctrl_cluster.hh(hh_pos)),".dat");
+	if fileexist(f_name) then
+		setfile(working_file,f_name);
+		fileread(working_file,c_i);
+		close(working_file);							
+		if tonumber(c_i[10:3]) = tonumber(cod_oper) | tonumber(c_i[13:3]) = tonumber(cod_oper) then { !! TO DO - location of second and Ag interviewer code }
+			sec_enum = 1;
+		else
+			errmsg(11010,edit("999",tonumber(c_i[10:3])),edit("999",tonumber(c_i[13:3])));
+			sec_enum = 0; { allow them to re-receive in case assignment has changed }
+		endif;	
+	else
+		sec_enum = 0;	
+	endif;
+
+	if sec_enum in 0,1 then	
+		always = 1;
+	else
+		always = 0;
+	endif;
+	
+	while always = 1 do
+		if sec_enum = 1 then
+			{ENG+} choice2 = accept(concat("Secondary interviewer menu, Interviewer B: (",cod_oper,") ",strip(iname)),
+					concat("Cluster: ",edit("999",ser.c_cluster)," - ",
+					"Household: ",edit("999",ctrl_cluster.hh(hh_pos))),		{1}
+					"============ Main options =============",				{2}
+					"1. Data entry",										{3}
+					"========= Communication options =========",			{4}
+					"2. Receive assignment from first interviewer",			{5}
+					"3. Send data to first interviewer", 					{6}
+					"=====================================",				{7}
+					"4. Return to Main menu");								{8}
+             {+ENG}
+             {{FR+} choice2 = accept (concat ("Menu de l'enquêteur secondaire, Enquêteur B: (", cod_oper, ")", strip (iname)),
+                    concat ("Grappe:", edit ("999", ser.c_cluster), "-",
+                    "Ménage:", edit("999", ctrl_cluster.hh (hh_pos))), {1}
+                    "============ Options principales =============", {2}
+                    "1. Saisie de données", {3}
+                    "========= Options de communication =========", {4}
+                    "2. Recevez les données du premier enquêteur", {5}
+                    "3. Envoyez les données au premier enquêteur", {6}
+                    "====================================", {7}
+                    "4. Retour au menu principal"); {8}
+             {+FR}}
+			if choice2 = 3 then 		{ Call dataentry process}
+				setfile(check,concat("./Data/Rawd/A",edit ("999",c_cluster),edit ("999",curr_hh),cod_oper,".dat"));
+				if fileread( check, test ) = 0  then
+				  filecopy(concat("./Data/TEMP_2ND/A",edit ("999",c_cluster),edit ("999",curr_hh),edit("999",ctrl_cluster.enum(hh_pos)),".dat"),
+					concat("./Data/RAWD/A",edit ("999",c_cluster),edit ("999",curr_hh),cod_oper,".dat"));
+				endif;
+			    backupf( ctrl_cluster.hh (hh_pos) );
+				f_name = "application.pff";
+				en_genpff(1,c_cluster,curr_hh,6);
+				execPFF(strip(f_name),stop);
+				stop(1);		
+			elseif choice2 = 5 then 	{ receive initial data from 1st }
+				en_trans_from_1st(concat(edit ("999",c_cluster),edit ("999",curr_hh)),ctrl_cluster.enum(hh_pos));		
+			elseif choice2 = 6 then 	{ send data to 1st }
+				if en_2nd_completed(concat(edit ("999",c_cluster),edit ("999",curr_hh)),cod_oper) then
+					en_trans_to_1st(concat(edit ("999",c_cluster),edit ("999",curr_hh)),cod_oper);
+				endif;
+			elseif choice2 = 8 then 	{ return main menu }
+				always = 0;
+			endif;
+
+		else
+			{ENG+} choice2 = accept(concat("Secondary interviewer menu, Interviewer B: (",cod_oper,") ",strip(iname)),
+					concat("Cluster: ",edit("999",ser.c_cluster)," - ",
+					"Household: ",edit("999",ctrl_cluster.hh(hh_pos))),			{1}
+					"============ Main options =============",					{2}
+					"1. Data entry (not available)",					{3}
+					"========= Communication options =========",				{4}
+					"2. Receive assignment from first interviewer",				{5}
+					"3. Send data to first interviewer (not available)",		{6}
+					"=====================================",					{7}
+					"4. Return to Main menu");									{8}
+			 {+ENG}
+             {{FR+} choice2 = accept (concat ("Menu de l'enquêteur secondaire, Enquêteur B: (", cod_oper, ")", strip (iname)),
+                     concat ("Grappe:", edit ("999", ser.c_cluster), "-",
+                     "Ménage:", edit("999", ctrl_cluster.hh (hh_pos))), {1}
+                     "============ Options principales =============", {2}
+                     "1. Entrée de données (non disponible)", {3}
+                     "========= Options de communication =========", {4}
+                     "2. Recevez les données du premier enquêteur", {5}
+                     "3. Envoyez les données au premier enquêteur (non disponible)", {6}
+                     "====================================", {7}
+                     "4. Retour au menu principal"); {8}
+             {+FR}}
+			if choice2 = 3 then 		{ Call dataentry process}
+			elseif choice2 = 5 then 	{ receive initial data from 1st }
+				en_trans_from_1st(concat(edit ("999",c_cluster),edit ("999",curr_hh)),ctrl_cluster.enum(hh_pos));		
+			elseif choice2 = 6 then 	{ send data to 1st }
+			elseif choice2 = 8 then 	{ return main menu }
+				always = 0;
+			endif;
+		
+		
+		endif;
+	enddo;
+
+
+end;
+
+
+
+
+PROC INTERVIEWER_FF
+preproc
+  filedelete("../LOOKUP/*.csidx");
+  filedelete("./LOOKUP/*.csidx");
+
+  if !fileexist("..\Lookup\interv.dat") | !fileexist("..\Lookup\clusters.dat") | !fileexist("..\Lookup\sampsel.dat") then
+    lrc = en_first_transmission();
+	if lrc = 0 then
+	  errmsg(11004);
+	  stop(1);
+	endif;
+  endif;
+  cluster_ok = 0;
+  backup = "./DATA/BACKUP/";                            { drive and directory to backup data }
+  if !direxist(backup) then
+    dircreate(backup);
+  endif;
+
+  data = "./DATA/RAWD/";
+
+{checking for Serialization}
+  CheckSerial(); 
+
+
+
+PROC INTERVIEWER_ID
+onfocus
+{  scode = "2";			{ key for unique record master tables }
+  lrc = loadcase(ser,scode);
+  if lrc = 0 then
+	lrc = en_serial();
+  endif;}
+  cod_oper = edit("999",ser.eq_id);
+
+  loadcase(interv,cod_oper);
+  always = 1;
+  while always = 1 do
+	{ENG+} choice = accept(concat("Interviewer main menu, Interviewer: ",cod_oper," ",strip(iname)),
+			  concat("Cluster: ",edit("999",ser.c_cluster)),	{1}
+			  "========== Main Options =============",			{2}
+			  "1. Data entry options",							{3}
+			  "2. Secondary interviewer options",					{4}
+			  "3. Change cluster",								{5}
+			  "========== Communication Options =====",			{6}
+			  "4. Transmit data to Supervisor",					{7}
+			  "5. Receive updates from Supervisor",				{8}
+			  "========== Other Options =============",			{9}
+			  "6. Backup to external flash memory",				{10}
+			  "7. List individuals for anthropometry",			{11}
+			  concat("8. Exit application                 ",p_version));{12}
+     {+ENG}
+     {{FR+} choice = accept (concat ("Menu principal de l'enquêteur, Enquêteur: ", cod_oper, " ", strip (iname)),
+              concat ("Grappe:", edit ("999", ser.c_cluster)), {1}
+              "========== Options principales =============", {2}
+              "1. Options de saisie de données", {3}
+              "2. Options de l'enquêteur secondaire", {4}
+              "3. Changer de cluster", {5}
+              "========== Options de communication =====", {6}
+              "4. Transmettre les données au superviseur", {7}
+              "5. Recevoir les mises à jour du superviseur", {8}
+              "========== Autres options ============", {9}
+              "6. Sauvegarde sur mémoire flash externe", {10}
+              "7. Liste des individus pour l'anthropométrie", {11}
+              concat ("8. Quitter l'application                 ", p_version)); {12}
+     {+FR}}
+    if choice =  3 then 		{ Call data entry process }
+	  main = 1;
+      $ = "";
+	  cluster_id = ser.c_cluster;
+	  advance HH_number;
+	elseif choice = 4 then 	{ secondary interviewer menu }
+	  main = 2;
+      $ = "";
+	  cluster_id = ser.c_cluster;
+	  advance HH_number;
+	elseif choice = 5 then 	{ Cluster selection }
+	  $ = "";
+	  advance cluster_id;
+	elseif choice in 2,6,9 then 	{ do nothing }
+	elseif choice = 7 then 	{ Transmit to team leader}
+	  en_prepare();	
+	  if ser.eq_id % 10 <> 0 then { !! TO DO supervisor code end in 0 on team } 
+	    en_transmission();
+	  endif;
+          execPFF("interviewer.pff",stop);
+	  stop(-1);
+	elseif choice = 8 then 	{ Receive updates and general data from C.O. }
+	  en_first_transmission();
+	elseif choice = 10 then 	{ backup to flash }
+	  {ENG+} errmsg("Confirm flash memory is connected to the tablet"); {+ENG}
+	  {{FR+} errmsg("Vérifiez que la mémoire flash est connectée à la tablette"); {+FR}}
+	  en_backup();
+	elseif choice = 11 then
+	  cluster_id = ser.c_cluster;	
+      advance to HH_number;
+	elseif choice = 12 then 	{ exit }
+	  stop(1);
+	endif;
+  enddo;
+
+
+PROC CLUSTER_ID
+preproc
+  i = 0;
+
+postproc
+  if $ = 0 then
+	errmsg(11005);
+	reenter;
+  endif;
+  
+  cluster_c = edit("999",$);
+  lrc = loadcase(clusters,cluster_c);
+  if lrc = 0 then
+	errmsg(11006,$);
+	reenter;
+  endif;
+  
+  cluster_c = edit("999",$);
+  lrc = loadcase(ctrl_cluster,cluster_c);
+  if lrc = 0 then
+	errmsg(11021);
+	inc(i);
+	if i > 2 then
+	  move INTERVIEWER_ID;
+	endif;
+	reenter;
+  endif;
+  
+  if cl_status <> 1 then
+	errmsg(11022);
+	inc(i);
+	if i > 2 then
+	  move INTERVIEWER_ID;
+	endif;
+	reenter;
+  endif;
+
+  ser.c_cluster = $;
+  writecase(ser);
+  if choice = 5 then
+	move INTERVIEWER_ID;
+  endif;
+
+PROC HH_NUMBER
+onfocus
+  cluster_c = edit("999",ser.c_cluster);
+  lrc = loadcase(clusters,cluster_c);
+  if lrc = 0 then
+	errmsg(11024);
+	stop(1);
+  endif;
+
+  { total number of households in the cluster, including hidden households }
+  hh_count = ytothh;
+  lrc = loadcase(ctrl_cluster,cluster_c);
+  if lrc = 0 then
+	errmsg(11023);
+	stop(1);
+  endif;
+
+  if choice = 4 then
+    {ENG+} j = show(ctrl_cluster.hh_assignment, HH,ENUM,HEAD_HH_NAME, title("HH number","Interviewer A","Resp HH Member"));  {+ENG}
+    {{FR+} j = show(ctrl_cluster.hh_assignment, HH,ENUM,HEAD_HH_NAME, title("Numéro du ménage","Enquêteur A","Contact du MNG"));  {+FR}}
+    $ = j;
+    i = j;
+  else
+    {ENG+} j = show(ctrl_cluster.hh_assignment, HH,ENUM,HEAD_HH_NAME
+		where ENUM = tonumber(cod_oper)	title("HH number","Interviewer A","Resp HH Member"));
+     {+ENG}
+    {{FR+} j = show(ctrl_cluster.hh_assignment, HH,ENUM,HEAD_HH_NAME
+		where ENUM = tonumber(cod_oper)	title("Numéro du ménage","Enquêteur A","Contact du MNG"));
+     {+FR}}
+	i = 1;
+	k = 1;
+	while i <= hh_count do { !! TO DO - if this code doesn't work, modify dictionary and use selcase }
+	  if ctrl_cluster.enum(i) <> tonumber(cod_oper) then
+	    inc(i);
+	  else
+	    if j <> k then
+	      inc(k);
+	      inc(i);	  
+	    else
+	      $ = ctrl_cluster.hh(i);
+	      break;
+        endif;
+	  endif;
+	enddo;
+
+  endif;
+			
+  if j = 0 | j > hh_count then
+    if count(ctrl_cluster.hh_assignment where ENUM = tonumber(cod_oper)) = 0 then
+      errmsg(11029);
+    else
+	  errmsg(11030);
+	endif;
+	move INTERVIEWER_ID;
+  endif;
+ 
+  if ctrl_cluster.enum(i) = 0 then
+	errmsg(11026);
+	move INTERVIEWER_ID;
+  endif; 
+
+  if choice = 11 then
+	  f_name = "application.pff";
+	  curr_hh = ctrl_cluster.hh(i);
+	  en_genpff(4,c_cluster,curr_hh,0);
+ 	  execPFF(strip(f_name),stop);
+  endif;	  
+  if ctrl_cluster.enum(i) = ser.eq_id then
+	en_entry_enum1(i);
+	move INTERVIEWER_ID;
+  endif;	
+
+  { secondary interviewer menu - called when chosen household is not assigned to interviewer }  
+  en_entry_enum2(i);
+  move INTERVIEWER_ID;
+
+

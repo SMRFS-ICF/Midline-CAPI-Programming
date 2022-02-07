@@ -1,0 +1,20 @@
+﻿[CSPro Application]
+Version=CSPro 7.2
+Label=LISTELIG
+Name=LISTELIG
+AppType=DataEntry
+OperatorID=No
+ShowEndCaseDialog=No
+[External Dictionaries]
+File=..\Dicts\CFTF.dcf
+[AppCode]
+File=.\listelig.apc
+[Message]
+File=.\listelig.mgf
+[Help]
+File=.\listelig.qsf
+[Forms]
+File=.\Cnull.fmf
+[Dictionary Types]
+Dict-Type=..\Dicts\Cnull.dcf,Input,.\Cnull.fmf
+Dict-Type=..\Dicts\CFTF.dcf,External

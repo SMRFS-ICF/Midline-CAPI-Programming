@@ -1,0 +1,55 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=SECONDMODULE_FF
+Label=SecondModule
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=OperatorControlled
+  
+[Dictionaries]
+File=.\SecondModule.dcf
+  
+[Form]
+Name=FORM000
+Label=SecondModule questionnaire
+Level=1
+Size=269,123
+  
+Item=SECOND_MODULE_TEMP_VAR
+Item=SECONDMODULE_ID
+  
+[EndForm]
+  
+[Level]
+Name=SECONDMODULE_QUEST
+Label=SecondModule questionnaire
+  
+[Group]
+Required=Yes
+Name=SECONDMODULE_QUEST_FORM
+Label=SecondModule questionnaire
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=SECOND_MODULE_TEMP_VAR
+Position=229,42,244,62
+Item=SECOND_MODULE_TEMP_VAR,SECONDMODULE_DICT
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=8,45,201,61
+Text=SECOND_MODULE_TEMP_VAR
+ 
+  
+[Field]
+Name=SECONDMODULE_ID
+Position=4,5,19,25
+Item=SECONDMODULE_ID,SECONDMODULE_DICT
+Protected=Yes
+Form=1
+  
+[EndGroup]
+  

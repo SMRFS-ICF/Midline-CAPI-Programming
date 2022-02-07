@@ -1,0 +1,56 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=Interviewer
+Name=INTERVIEWER_DICT
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=Interviewer questionnaire
+Name=INTERVIEWER_QUEST
+
+[IdItems]
+
+[Item]
+Label=Interviewer identification
+Name=INTERVIEWER_ID
+Start=1
+Len=8
+DataType=Alpha
+
+[Record]
+Label=Interviewer record
+Name=INTERVIEWER_REC
+RecordTypeValue=''
+RecordLen=16
+
+[Item]
+Label=Cluster number
+Name=CLUSTER_ID
+Start=9
+Len=4
+
+[Item]
+Label=HH number
+Name=HH_NUMBER
+Start=13
+Len=2
+
+[ValueSet]
+Label=HH number
+Name=HH_NUMBER_VS1
+Value=1:16;Valid
+
+[Item]
+Label=PID number
+Name=PID_NUMBER
+Start=15
+Len=2
+
+[ValueSet]
+Label=PID number
+Name=PID_NUMBER_VS1
+Value=0:20;Valid

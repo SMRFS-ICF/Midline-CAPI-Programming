@@ -1,0 +1,22 @@
+﻿[CSPro Application]
+Version=CSPro 7.6
+Label=SECONDMODULE
+Name=SECONDMODULE
+AppType=DataEntry
+[External Dictionaries]
+File=..\Dicts\Interv.dcf
+File=..\Dicts\CTRL_HH.dcf
+File=..\Dicts\CFTF.dcf
+[AppCode]
+File=.\SecondModule.apc
+[Message]
+File=.\SecondModule.mgf
+[Help]
+File=.\SecondModule.qsf
+[Forms]
+File=.\SecondModule.fmf
+[Dictionary Types]
+Dict-Type=..\Dicts\Interv.dcf,External
+Dict-Type=..\Dicts\CTRL_HH.dcf,External
+Dict-Type=..\Dicts\CFTF.dcf,External
+Dict-Type=.\SecondModule.dcf,Input,.\SecondModule.fmf

@@ -1,0 +1,75 @@
+﻿[FormFile]
+Version=CSPro 6.3
+Name=FL_GPS
+Label=GPS coordinates
+DefaultTextFont=-013 0000 0000 0000 0700 0000 0000 0000 0000 0000 0000 0000 0000 Arial
+FieldEntryFont=0018 0000 0000 0000 0600 0000 0000 0000 0000 0000 0000 0000 0000 Courier New
+Type=SystemControlled
+  
+[Dictionaries]
+File=..\dicts\GPS.dcf
+  
+[Form]
+Name=FORM000
+Label=GPS coordinates
+Level=1
+Size=746,159
+  
+Item=GPSID
+Item=AHLATITUDE
+Item=AHLONGITUDE
+  
+[EndForm]
+  
+[Level]
+Name=GPS_LEVEL
+Label=GPS coordinates level
+  
+[Group]
+Required=Yes
+Name=GPS_LEVEL1
+Label=GPS coordinates
+Form=1
+LogicControl=No
+Max=1
+  
+[Field]
+Name=GPSID
+Position=425,32,510,52
+Item=GPSID,HH_GPS
+Protected=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=84,35,125,51
+Text=GPSID
+ 
+  
+[Field]
+Name=AHLATITUDE
+Position=283,110,424,130
+Item=AHLATITUDE,HH_GPS
+Protected=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=183,113,264,129
+Text=AHLATITUDE
+ 
+  
+[Field]
+Name=AHLONGITUDE
+Position=580,114,721,134
+Item=AHLONGITUDE,HH_GPS
+Protected=Yes
+FieldLabelType=DictionaryName
+Form=1
+  
+[Text]
+Position=480,117,573,133
+Text=AHLONGITUDE
+ 
+[EndGroup]
+  

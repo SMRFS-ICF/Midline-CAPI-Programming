@@ -1,0 +1,54 @@
+﻿[CAPI QUESTIONS]
+Version=CSPro 6.3
+
+[LANGUAGES]
+ENG=English
+
+[QUESTION]
+Field=ENUMERATOR_DICT.CLUSTER_ID
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3082{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;}
+ENG={\*\generator Riched20 10.0.10586}\viewkind4\uc1 
+ENG=\pard\cf1\b\fs28 Enumerator Menu\par
+ENG=\b0\fs24\par
+ENG=Enter Cluster No.\par
+ENG=
+ENG=\pard\b\fs28\par
+ENG=}
+
+[QUESTION]
+Field=ENUMERATOR_DICT.ENUMERATOR_ID
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3082{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;}
+ENG={\*\generator Riched20 10.0.10586}\viewkind4\uc1 
+ENG=\pard\cf1\b\fs28 Enumerator Menu\par
+ENG=\b0\fs24\par
+ENG=Enter password to change serialization\par
+ENG=\par
+ENG=}
+
+[QUESTION]
+Field=ENUMERATOR_DICT.HH_NUMBER
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3082{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;}
+ENG={\*\generator Riched20 10.0.10586}\viewkind4\uc1 
+ENG=\pard\cf1\b\fs28 Enumerator Menu\par
+ENG=\b0\fs24\par
+ENG=Enter Household ID for cluster %ser.c_cluster% \par
+ENG=\b\fs28\par
+ENG=\par
+ENG=}
+
+[QUESTION]
+Field=ENUMERATOR_DICT.TEAM_IDNUM
+ENG={\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3082{\fonttbl{\f0\fnil\fcharset0 Arial;}}
+ENG={\colortbl ;\red0\green0\blue0;}
+ENG={\*\generator Riched20 10.0.10586}\viewkind4\uc1
+ENG=\pard\cf1\b\fs28 Enumerator Menu - INITIALIZATION\par
+ENG=\b0\fs24\par
+ENG=Enter Team number\par
+ENG=\par
+ENG=
+ENG=\pard\par
+ENG=}
+
