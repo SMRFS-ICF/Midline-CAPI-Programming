@@ -1,0 +1,114 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=Sample selection
+Name=SAMPSEL
+RecordTypeStart=4
+RecordTypeLen=1
+Positions=Relative
+ZeroFill=No
+DecimalChar=No
+
+[Level]
+Label=Sample selection questionnaire
+Name=SAMPSEL_QUES
+
+[IdItems]
+
+[Item]
+Label=Cluster number
+Name=XCLUSTER
+Start=1
+Len=3
+ZeroFill=Yes
+
+[Record]
+Label=General Cluster information
+Name=SAMREC1
+RecordTypeValue='1'
+RecordLen=14
+
+[Item]
+Label=Total households in cluster
+Name=XTOTAL
+Start=5
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Date cluster was entered (YYMMDD)
+Name=XCLDATE
+Start=8
+Len=6
+
+[Item]
+Label=Changes to households originally selected
+Name=XCHANGE
+Start=14
+Len=1
+
+[ValueSet]
+Label=Changes to households originally selected
+Name=XCHANGE_VS1
+Value=1;See table of assignments
+Value=2;Assign interviewers
+Value=3;Change household address
+Value=4;Change head of household name
+Value=5;Add a household
+Value=9;Return to main menu
+
+[Record]
+Label=Sample selection households
+Name=SAMREC2
+RecordTypeValue='2'
+MaxRecords=35
+RecordLen=87
+
+[Item]
+Label=Household number
+Name=XNUMBER
+Start=5
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Household address
+Name=XADDRESS
+Start=8
+Len=40
+DataType=Alpha
+
+[Item]
+Label=Name of household head
+Name=XNAME
+Start=48
+Len=30
+DataType=Alpha
+
+[Item]
+Label=HH interview result
+Name=XRESULT
+Start=78
+Len=1
+
+[ValueSet]
+Label=HH interview result
+Name=XRESULT_VS1
+Value=0;Not yet visited
+Value=1;Completed
+Value=2;No HH member at home, or no competent respondent at home
+Value=3;HH absent
+Value=4;Postponed
+Value=5;Refused
+Value=9;Other
+
+[Item]
+Label=Interviewer assigned to household
+Name=XINTCODE
+Start=79
+Len=3
+
+[Item]
+Label=Date HH assigned to interviewer (YYMMDD)
+Name=XINTDATE
+Start=82
+Len=6

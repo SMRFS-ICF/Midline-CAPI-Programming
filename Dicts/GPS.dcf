@@ -1,0 +1,44 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=GPS Coordinates
+Name=HH_GPS
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=No
+
+[Level]
+Label=GPS coordinates level
+Name=GPS_LEVEL
+
+[IdItems]
+
+[Item]
+Label=Questionnaire ID (3-digit cluster + 3-digit HH)
+Name=GPSID
+Start=1
+Len=6
+DataType=Alpha
+
+[Record]
+Label=GPS coordinates
+Name=GPS_REC
+RecordTypeValue=''
+RecordLen=26
+
+[Item]
+Label=Latitude
+Name=AHLATITUDE
+Start=7
+Len=10
+Decimal=5
+DecimalChar=Yes
+
+[Item]
+Label=Longitude
+Name=AHLONGITUDE
+Start=17
+Len=10
+Decimal=5
+DecimalChar=Yes

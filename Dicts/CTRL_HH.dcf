@@ -1,0 +1,202 @@
+﻿[Dictionary]
+Version=CSPro 7.6
+Label=CTRL_HH
+Name=CTRL_HH
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+SecurityOptions=1C3C95C71E64111E6F1F37A95D602C6398C285610D8D9004B4718E9931516828
+
+[Level]
+Label=CTRL_HH questionnaire
+Name=CTRL_HH_QUEST
+
+[IdItems]
+
+[Item]
+Label=Cluster
+Name=H_CLUSTER
+Start=1
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Household
+Name=H_HH
+Start=4
+Len=3
+ZeroFill=Yes
+
+[Record]
+Label=CTRL_HH record
+Name=CTRL_HH_REC
+RecordTypeValue=''
+RecordLen=73
+
+[Item]
+Label=First interviewer assigned
+Name=H_INT1
+Start=7
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Second interviewer assigned
+Name=H_INT2
+Start=10
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Ag interviewer assigned
+Name=H_INT3
+Start=13
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 1 & 2 (HH roster, Dwelling) completed
+Name=H_MOD1
+Start=16
+Len=1
+
+[ValueSet]
+Label=Module 1 & 2 (HH roster, Dwelling) completed
+Name=H_MOD1_VS1
+Value=1;Completed
+Value=0;Incomplete
+
+[Item]
+Label=Module 3 (Food security) interviewer assigned
+Name=H_MOD3
+Start=17
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 4 (Women nutrition + anthropometry) interviewer assigned
+Name=H_MOD4
+Start=20
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 5 (Children nutrition + anthropometry) interviewer assigned
+Name=H_MOD5
+Start=23
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 6F (Primary female decisionmaker) interviewer assigned
+Name=H_MOD6F
+Start=26
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 6M (Primary male decisionmaker) interviewer assigned
+Name=H_MOD6M
+Start=29
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.90 (Land mapping) interviewer assigned
+Name=H_MOD790
+Start=32
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.1 (Maize) interviewer assigned
+Name=H_MOD71
+Start=35
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.2 (Common bean) interviewer assigned
+Name=H_MOD72
+Start=38
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.3 (Coffee) interviewer assigned
+Name=H_MOD73
+Start=41
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.4 (Groundnut) interviewer assigned
+Name=H_MOD74
+Start=44
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.5 (Wheat) interviewer assigned
+Name=H_MOD75
+Start=47
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.6 (Soybean) interviewer assigned
+Name=H_MOD76
+Start=50
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.7 (Paddy rice) interviewer assigned
+Name=H_MOD77
+Start=53
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.50 (Dairy cows) interviewer assigned
+Name=H_MOD750
+Start=56
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.80 (Ag fish) interviewer assigned
+Name=H_MOD780
+Start=59
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.91 (Plot area) interviewer assigned
+Name=H_MOD791
+Start=62
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.92 (Crop yield) interviewer assigned
+Name=H_MOD792
+Start=65
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 7.96 (Pond area) interviewer assigned
+Name=H_MOD796
+Start=68
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Module 8 (Household consumption) interviewer assigned
+Name=H_MOD8
+Start=71
+Len=3
+ZeroFill=Yes

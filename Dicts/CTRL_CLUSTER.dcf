@@ -1,0 +1,161 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=CTRL_CLUSTER - Cluster status
+Name=CTRL_CLUSTER
+RecordTypeStart=4
+RecordTypeLen=1
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=CTRL_CLUSTER questionnaire
+Name=CTRL_CLUSTER_QUEST
+
+[IdItems]
+
+[Item]
+Label=Cluster
+Name=CLUSTER
+Start=1
+Len=3
+ZeroFill=Yes
+
+[Record]
+Label=CTRL_CLUSTER record
+Name=CTRL_CLUSTER_REC
+RecordTypeValue='1'
+Required=No
+RecordLen=17
+
+[Item]
+Label=cluster status
+Name=CL_STATUS
+Note=control variable, Enumerators have to check this variable to see if this cluster is open to do HH interviews.\r\n
+Note=\r\n
+Note=Indicate if the cluster is open to do interviews.\r\n
+Note=NOTAPPL => Not yet assigned for interviews\r\n
+Note=1 => Open to do interviews, Have to assign HH to each enumerator\r\n
+Note=2 => Cluster finished, no more interviews will be allowed, Enumerator's tablets are blocked to select HH for this
+Note=cluster
+Start=5
+Len=1
+
+[ValueSet]
+Label=cluster status
+Name=CL_STATUS_VS1
+Value=1;Open
+Value=2;Close
+Value=' ';Not attended
+Name=NOTAPPL,Special
+
+[Item]
+Label=Total households
+Name=SHTOTAL
+Start=6
+Len=2
+
+[Item]
+Label=Households complete
+Name=SHCOMP
+Start=8
+Len=2
+
+[Item]
+Label=Households incomplete
+Name=SHINCOMP
+Start=10
+Len=2
+
+[Item]
+Label=Date cluster was completed
+Name=SFINDATE
+Start=12
+Len=6
+
+[Record]
+Label=HH assignment record
+Name=HH_ASSIGNMENT
+RecordTypeValue='2'
+Required=No
+MaxRecords=35
+RecordLen=113
+
+[Item]
+Label=Household number
+Name=HH
+Note=HH code, can be also a replacement
+Start=5
+Len=3
+
+[Item]
+Label=Household position in sample (clusters)
+Name=HH_PID
+Note=Always 0, except for Panel clusters
+Start=8
+Len=2
+
+[Item]
+Label=Team leader assigned
+Name=T_LEADER
+Note=Team leader code = team code
+Start=10
+Len=3
+
+[Item]
+Label=Interviewer number
+Name=ENUM
+Note=Enumerator code who is doing the interview
+Start=13
+Len=3
+
+[Item]
+Label=Interviewer name
+Name=ENUM_NAME
+Start=16
+Len=30
+DataType=Alpha
+
+[Item]
+Label=HH status
+Name=HH_STATUS
+Note=Indicate if the HH is open to do interviews.\r\n
+Note=NOTAPPL => No data received from the enumerator\r\n
+Note=1 => data received, however the HH PartA is in partial save\r\n
+Note=2 => HH completed. No more data will be received for this HH
+Start=46
+Len=1
+
+[ValueSet]
+Label=HH status
+Name=HH_STATUS_VS1
+Value=1;In process
+Value=2;Finished
+Value=' ';Not attended
+Name=NOTAPPL,Special
+
+[Item]
+Label=Head of household name
+Name=HEAD_HH_NAME
+Start=47
+Len=30
+DataType=Alpha
+
+[Item]
+Label=HH address
+Name=HH_ADDRESS
+Start=77
+Len=30
+DataType=Alpha
+
+[Item]
+Label=Household accepted
+Name=SACCEPTH
+Start=107
+Len=1
+
+[Item]
+Label=Date full case accepted
+Name=SACCEPTF
+Start=108
+Len=6

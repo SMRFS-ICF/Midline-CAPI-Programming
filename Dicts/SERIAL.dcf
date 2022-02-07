@@ -1,0 +1,52 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=Equipment serialization
+Name=SER
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=Serial questionnaire
+Name=SERIAL_QUEST
+
+[IdItems]
+
+[Item]
+Label=Serial identification
+Name=SERIAL_ID
+Start=1
+Len=1
+
+[Record]
+Label=Serial record
+Name=SERIAL_REC
+RecordTypeValue=''
+RecordLen=10
+
+[Item]
+Label=Equipment number
+Name=EQ_ID
+Start=2
+Len=3
+
+[Item]
+Label=Current cluster
+Name=C_CLUSTER
+Start=5
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Team ID
+Name=TEAM_ID
+Start=8
+Len=2
+
+[Item]
+Label=Interviewer sex
+Name=EQ_ID_SEX
+Start=10
+Len=1

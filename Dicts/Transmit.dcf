@@ -1,0 +1,86 @@
+﻿[Dictionary]
+Version=CSPro 7.1
+Label=Transmit
+Name=TRANSMIT
+RecordTypeStart=4
+RecordTypeLen=1
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=Transmit questionnaire
+Name=TRANSMIT_QUEST
+
+[IdItems]
+
+[Item]
+Label=Cluster number
+Name=TCLUSTER
+Start=1
+Len=3
+ZeroFill=Yes
+
+[Record]
+Label=Transmittal sheet summary
+Name=TRECORD1
+RecordTypeValue='1'
+RecordLen=8
+
+[Item]
+Label=Number of bar codes in transmittal sheet
+Name=TBCODES
+Start=5
+Len=3
+
+[Item]
+Label=Auxiliar to display options (used in CAPI surveys)
+Name=TAUXILIAR
+Start=8
+Len=1
+
+[ValueSet]
+Label=Auxiliar to display options (used in CAPI surveys)
+Name=TAUXILIAR_VS1
+Value=1;Ajouter barcode
+Value=2;Supprimer barcode
+Value=9;Résiliez
+
+[Record]
+Label=HIV transmit record
+Name=TRECORD2
+RecordTypeValue='2'
+Required=No
+MaxRecords=100
+RecordLen=13
+
+[Item]
+Label=Line number
+Name=TLINE
+Start=5
+Len=3
+
+[ValueSet]
+Label=Line number
+Name=TLINE_VS1
+Value=1:200
+Value=0;Supprime le barcode
+
+[Item]
+Label=Bar code
+Name=TBARCODE
+Start=8
+Len=5
+DataType=Alpha
+
+[Item]
+Label=More bar codes (used in CAPI surveys)
+Name=TMORE
+Start=13
+Len=1
+
+[ValueSet]
+Label=More bar codes (used in CAPI surveys)
+Name=TMORE_ENG
+Value=1;Oui
+Value=2;Non

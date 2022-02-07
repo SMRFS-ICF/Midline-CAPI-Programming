@@ -1,0 +1,39 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=weights
+Name=WEIGHTS
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=weights questionnaire
+Name=WEIGHTS_QUEST
+
+[IdItems]
+
+[Item]
+Label=weights identification
+Name=WCLUSTER
+Start=1
+Len=3
+
+[Record]
+Label=weights record
+Name=WEIGHTS_REC
+RecordTypeValue=''
+RecordLen=25
+
+[Item]
+Label=Household weight
+Name=HHWEIGHT
+Start=4
+Len=11
+
+[Item]
+Label=Women's weight
+Name=WWEIGHT
+Start=15
+Len=11

@@ -1,0 +1,46 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=CTRL_GENERAL - Central parameters
+Name=C_G
+Note=General parameters, file updated only in central office
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=CTRL_GENERAL questionnaire
+Name=CTRL_GENERAL_QUEST
+
+[IdItems]
+
+[Item]
+Label=CTRL_GENERAL identification - Always "1"
+Name=CTRL_GENERAL_ID
+Start=1
+Len=1
+
+[Record]
+Label=CTRL_GENERAL record
+Name=CTRL_GENERAL_REC
+RecordTypeValue=''
+RecordLen=17
+
+[Item]
+Label=Supervisor Initialization key
+Name=S_INITIALIZATION_KEY
+Note=Supervisor password used to reinitialize the team leader tablet\r\n
+Note=Updated by the central office
+Start=2
+Len=8
+DataType=Alpha
+
+[Item]
+Label=Enumerator initialization key
+Name=E_INITIALIZATION_KEY
+Note=Enumerator password used to reinitialize the tablet\r\n
+Note=Updated by the central office
+Start=10
+Len=8
+DataType=Alpha

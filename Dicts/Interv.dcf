@@ -1,0 +1,95 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=Interviewer information
+Name=INTERV
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=Yes
+DecimalChar=Yes
+
+[Level]
+Label=Interviewer level
+Name=INTERV_LEVEL
+
+[IdItems]
+
+[Item]
+Label=Supervisor/Interviewer code
+Name=ICODE
+Start=1
+Len=3
+ZeroFill=Yes
+
+[ValueSet]
+Label=Supervisor/Interviewer code
+Name=ICODE_VS1
+Note=this same range is defined in the Interv.dcf\r\n
+Note=\r\n
+Note=therefore, if changes are made to this dcf, make the same changes there
+Value=11;Team 1 Supervisor
+Value=12;Team 1 Interviewer
+Value=13;Team 1 Interviewer
+Value=14;Team 1 Interviewer
+Value=15;Team 1 Interviewer
+Value=19;Team 1 Ag Specialist
+Value=21;Team 2 Supervisor
+Value=22;Team 2 Interviewer
+Value=23;Team 2 Interviewer
+Value=24;Team 2 Interviewer
+Value=25;Team 2 Interviewer
+Value=29;Team 2 Ag Specialist
+
+[Record]
+Label=Interviewer record
+Name=INTERV_REC
+RecordTypeValue=''
+RecordLen=37
+
+[Item]
+Label=Supervisor/ Interviewer name
+Name=INAME
+Start=4
+Len=30
+DataType=Alpha
+
+[Item]
+Label=Team number
+Name=ITEAM
+Start=34
+Len=2
+ZeroFill=Yes
+
+[ValueSet]
+Label=Team number
+Name=ITEAM_VS1
+Value=1:27
+
+[Item]
+Label=Role on team
+Name=IROLE
+Start=36
+Len=1
+ZeroFill=Yes
+
+[ValueSet]
+Label=Role on team
+Name=IROLE_VS1
+Note=i renumbered this so that ending digit of sup, field editor, \r\n
+Note=and anthropometrists' ID will align with their role
+Value=0;Supervisor/Team leader
+Value=1;Interviewer
+Value=2;Ag specialist
+
+[Item]
+Label=Sex of fieldworker
+Name=ISEX
+Start=37
+Len=1
+ZeroFill=Yes
+
+[ValueSet]
+Label=Sex of fieldworker
+Name=ISEX_VS1
+Value=1;Male
+Value=2;Female

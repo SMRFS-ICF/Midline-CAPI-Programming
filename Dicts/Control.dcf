@@ -1,0 +1,108 @@
+﻿[Dictionary]
+Version=CSPro 6.3
+Label=DP Control File
+Name=CONTROL
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=No
+
+[Level]
+Label=LEVEL1
+Name=LEVEL_1
+
+[IdItems]
+
+[Item]
+Label=Cluster number
+Name=CSAMPLE
+Start=1
+Len=3
+ZeroFill=Yes
+
+[Record]
+Label=Control sheet
+Name=CONTROLS
+RecordTypeValue=''
+RecordLen=62
+
+[Item]
+Label=Date data collection began
+Name=CDATEBEG
+Start=4
+Len=6
+
+[ValueSet]
+Label=Date data collection began
+Name=CDATEBEG_VS1
+Value=0
+Value=180101:221231;YYMMDD
+
+[Item]
+Label=Expected households
+Name=CHEXPECT
+Start=10
+Len=2
+
+[Item]
+Label=Total households
+Name=CHTOTAL
+Start=12
+Len=2
+
+[Item]
+Label=Total complete households
+Name=CHCOMP
+Start=14
+Len=2
+
+[Item]
+Label=Total incomplete households
+Name=CHINCOMP
+Start=16
+Len=2
+
+[Item]
+Label=Supervisor
+Name=CSUPERV
+Start=18
+Len=3
+ZeroFill=Yes
+
+[Item]
+Label=Date cluster passed structure check
+Name=CACCEPT
+Start=21
+Len=6
+
+[ValueSet]
+Label=Date cluster passed structure check
+Name=CACCEPT_VS1
+Value=0
+Value=20101:31231
+
+[Item]
+Label=Secondary editing dates
+Name=CEDIT
+Start=27
+Len=6
+Occurrences=5
+
+[ValueSet]
+Label=Secondary editing dates
+Name=CEDIT_VS1
+Value=0
+Value=20101:31231
+
+[Item]
+Label=Date cluster was closed (finalized)
+Name=CFINDATE
+Start=57
+Len=6
+
+[ValueSet]
+Label=Date cluster was closed (finalized)
+Name=CFINDATE_VS1
+Value=0
+Value=20101:31231

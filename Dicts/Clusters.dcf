@@ -1,0 +1,110 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=Cluster definition - sample
+Name=CLUSTERS
+RecordTypeStart=0
+RecordTypeLen=0
+Positions=Relative
+ZeroFill=No
+DecimalChar=No
+
+[Level]
+Label=LEVEL1
+Name=LEVEL_1
+
+[IdItems]
+
+[Item]
+Label=Cluster number
+Name=YCLUSTER
+Start=1
+Len=3
+ZeroFill=Yes
+
+[ValueSet]
+Label=Cluster number
+Name=YCLUSTER_VS1
+Value=1:214 301:414 940:999
+
+[Record]
+Label=Cluster variables
+Name=CLSTREC
+RecordTypeValue=''
+RecordLen=77
+
+[Item]
+Label=Region code
+Name=YGEO1CODE
+Start=4
+Len=2
+
+[ValueSet]
+Label=Region code
+Name=YGEO1CODE_VS1
+Value=1;East Hills
+Value=2;Center Hills
+Value=3;Mid-West Hills
+Value=4;Far-West Hills
+Value=5;Far-West Mtns
+
+[Item]
+Label=Region name
+Name=YGEO1NAME
+Start=6
+Len=20
+DataType=Alpha
+
+[Item]
+Label=District code
+Name=YGEO2CODE
+Start=26
+Len=3
+
+[Item]
+Label=District name
+Name=YGEO2NAME
+Start=29
+Len=20
+DataType=Alpha
+
+[Item]
+Label=County code
+Name=YGEO3CODE
+Start=49
+Len=3
+
+[Item]
+Label=County name
+Name=YGEO3NAME
+Start=52
+Len=20
+DataType=Alpha
+
+[Item]
+Label=Village code
+Name=YGEO4CODE
+Start=72
+Len=3
+
+[Item]
+Label=Urban/rural
+Name=YTYPE
+Start=75
+Len=1
+
+[ValueSet]
+Label=Urban/rural
+Name=YTYPE_VS1
+Value=1;Urban
+Value=2;Ruarl
+
+[Item]
+Label=Total # HHs to interview
+Name=YTOTHH
+Start=76
+Len=2
+
+[ValueSet]
+Label=Total # HHs to interview
+Name=YTOTHH_VS1
+Value=30

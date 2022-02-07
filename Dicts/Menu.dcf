@@ -1,0 +1,147 @@
+﻿[Dictionary]
+Version=CSPro 7.2
+Label=Menu
+Name=MENU_DICT
+RecordTypeStart=6
+RecordTypeLen=1
+Positions=Relative
+ZeroFill=No
+DecimalChar=Yes
+
+[Level]
+Label=Menu level
+Name=MENU_LEVEL
+
+[IdItems]
+
+[Item]
+Label=Level1 Identification
+Name=LEVEL1ID
+Start=1
+Len=5
+DataType=Alpha
+
+[Record]
+Label=WSEC01
+Name=WSEC01
+RecordTypeValue='1'
+RecordLen=106
+
+[Item]
+Label=Cluster number
+Name=WCLUSTER
+Start=7
+Len=3
+ZeroFill=Yes
+
+[ValueSet]
+Label=Cluster number
+Name=WCLUSTER_VS1
+Value=1:450;Valid clusters
+Value=999;Practice cluster
+
+[Item]
+Label=Select an option
+Name=WFINAL
+Start=10
+Len=1
+DataType=Alpha
+
+[Item]
+Label=Urban/rural
+Name=WURBRUR
+Start=11
+Len=6
+DataType=Alpha
+
+[ValueSet]
+Label=Urban/rural
+Name=WURBRUR_VS1
+Value='1     ';Urban
+Value='2     ';Rural
+
+[Item]
+Label=Region code
+Name=WREGION
+Start=17
+Len=5
+
+[ValueSet]
+Label=Region code
+Name=WREGION_VS1
+Value=1;Region 1
+Value=2;Region 2
+Value=3;Region 3
+Value=4;Region 4
+Value=5;Region 5
+
+[Item]
+Label=Region name
+Name=WREGIONN
+Start=22
+Len=25
+DataType=Alpha
+
+[Item]
+Label=District code
+Name=WDISTRICT
+Start=47
+Len=5
+
+[Item]
+Label=District name
+Name=WDISTRICTN
+Start=52
+Len=25
+DataType=Alpha
+
+[Item]
+Label=County code
+Name=WCOUNTY
+Start=77
+Len=5
+
+[Item]
+Label=County name
+Name=WCOUNTYN
+Start=82
+Len=25
+DataType=Alpha
+
+[Record]
+Label=WSEC02
+Name=WSEC02
+RecordTypeValue='2'
+RecordLen=46
+
+[Item]
+Label=Select an option
+Name=WFINAL2
+Start=7
+Len=1
+DataType=Alpha
+
+[Item]
+Label=Individual line number
+Name=WINDIV
+Start=8
+Len=2
+
+[Item]
+Label=Individual's name
+Name=WNAME
+Start=10
+Len=36
+DataType=Alpha
+
+[Item]
+Label=Is the correct individual
+Name=WCORRECT2
+Start=46
+Len=1
+
+[ValueSet]
+Label=Is the correct individual
+Name=WCORRECT2_VS1
+Value=1;Yes
+Value=2;No
